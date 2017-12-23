@@ -5,17 +5,7 @@ from nltk.tokenize import sent_tokenize
 from Definitions import ROOT_DIR
 import fnmatch
 
-class MySentences(object):
-    def __init__(self, dirname):
-        self.dirname = dirname
-
-    def __iter__(self):
-        for fname in os.listdir(self.dirname):
-            for line in open(os.path.join(self.dirname, fname)):
-                yield line.split()
-
-
-
+# iterate through all subdirectories recusively and store all Main texts to a list
 def iterate_folder(root):
 
     rootdir = root
@@ -48,8 +38,8 @@ def convertEncoding(filename, encoding='utf-8'):
 
     return list
 
-# Extract text from file and store it in a list
-def tokenize_file(filename):
+# Extract text from file and store its sentences in a list
+def sent_tokenize_file(filename):
 
     list = convertEncoding(filename)
 
@@ -70,20 +60,26 @@ def tokenize_file(filename):
 
     return sent_tokenize_list
 
-
+#store paths of all main-texts in the given directory to a list
 filelist = iterate_folder('S:\\VMs\\Shared\\Basket_Papers\\Basket_Papers\\misq\\2017\\3\\1')
 
 
-
+# number of the paper
 i = 0
 
-writefile = io.open('S:\\VMs\\Shared\\Maindata.txt', 'w', encoding="utf-8-sig")
+# iterate through all main texts and print their sentences
 for file in filelist:
     i+=1
     print(i)
-    for line in tokenize_file(file):
-        writefile.write(line + "\n")
+    for line in sent_tokenize_file(file):
+        print(line)
 
-writefile.close()
-
-
+# //store the sentences in a file
+# writefile = io.open('S:\\VMs\\Shared\\Maindata.txt', 'w', encoding="utf-8-sig")
+# for file in filelist:
+#     i+=1
+#     print(i)
+#     for line in tokenize_file(file):
+#         writefile.write(line + "\n")
+#
+# writefile.close()
