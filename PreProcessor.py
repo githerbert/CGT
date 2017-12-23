@@ -29,6 +29,7 @@ def iterate_folder(root):
                 mainfiles.append(os.path.join(subdir, file))
     return mainfiles
 
+# Write text from a given "cp1252" encoded file in a utf-8 file, read it and store it in a list
 def convertEncoding(filename, encoding='utf-8'):
 
     list = []
