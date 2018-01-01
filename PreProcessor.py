@@ -47,8 +47,10 @@ def sent_tokenize_file(filename):
 
     for line in list:
         words = line.split()
-        sentence = ' '.join([word for word in words])
-        fulltext = ' '.join((fulltext, sentence))
+    # Remove Headings
+        if not all(word[0].isupper() for word in words) and words[-1] != ".":
+            sentence = ' '.join([word for word in words])
+            fulltext = ' '.join((fulltext, sentence))
 
     # Join dash-seperated words
     fulltext = fulltext.replace("- ", "")
@@ -56,7 +58,6 @@ def sent_tokenize_file(filename):
     # Remove et al. from corpus
     fulltext = fulltext.replace(" et al.", "")
     sent_tokenize_list = sent_tokenize(fulltext)
-    print(sent_tokenize_list[1])
 
     return sent_tokenize_list
 
