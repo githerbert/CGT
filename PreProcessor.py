@@ -2,7 +2,7 @@
 # import modules & set up logging
 import os, io
 from nltk.tokenize import sent_tokenize
-from Definitions import ROOT_DIR
+from Definitions import ROOT_DIR, PAPER_DIR
 import fnmatch
 
 # iterate through all subdirectories recusively and store all Main texts to a list
@@ -62,7 +62,7 @@ def sent_tokenize_file(filename):
     return sent_tokenize_list
 
 #store paths of all main-texts in the given directory to a list
-filelist = iterate_folder('S:\\VMs\\Shared\\Basket_Papers\\Basket_Papers\\misq\\2017\\3\\1')
+filelist = iterate_folder(PAPER_DIR)
 
 
 # number of the paper
