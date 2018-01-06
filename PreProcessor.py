@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # import modules & set up logging
-import os, io
+import os, io,re
 from nltk.tokenize import sent_tokenize
 from Definitions import ROOT_DIR, PAPER_DIR
 import fnmatch
+from Contractions import CONTRACTIONS_DICT
 
 # iterate through all subdirectories recusively and store all Main texts to a list
 def iterate_folder(root):
@@ -55,11 +56,21 @@ def sent_tokenize_file(filename):
     # Join dash-seperated words
     fulltext = fulltext.replace("- ", "")
     fulltext = fulltext.replace(u"\u2013 ", "")
+    # Expand contractions
+    fulltext = expand_contractions(fulltext)
     # Remove et al. from corpus
     fulltext = fulltext.replace(" et al.", "")
     sent_tokenize_list = sent_tokenize(fulltext)
 
     return sent_tokenize_list
+
+
+def expand_contractions(s, contractions_dict=CONTRACTIONS_DICT):
+    def replace(match):
+        return contractions_dict[match.group(0)]
+    return contractions_re.sub(replace, s)
+
+contractions_re = re.compile('(%s)' % '|'.join(CONTRACTIONS_DICT.keys()))
 
 #store paths of all main-texts in the given directory to a list
 filelist = iterate_folder(PAPER_DIR)

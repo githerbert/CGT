@@ -1,5 +1,5 @@
 
-CONTRADICTIONS_DICT = {
+CONTRACTIONS_DICT = {
 "ain't": "am not / are not / is not / has not / have not",
 "aren't": "are not / am not",
 "can't": "cannot",
