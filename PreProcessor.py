@@ -50,12 +50,21 @@ def sent_tokenize_file(filename):
 
     for line in list:
         words = line.split()
-    # Remove Headings
-        if not all(word[0].isupper() for word in words) and words[-1] != ".":
-            #Lemmatize words
-            sentence = ' '.join([wordnet_lemmatizer.lemmatize(word) for word in words])
-            #sentence = ' '.join([word for word in words])
-            fulltext = ' '.join((fulltext, sentence))
+
+        #Remove punctutation for heading check
+        normalizedHeading = []
+        for i in range(len(words)):
+            normalizedWord = re.sub(r'([^a-zA-Z_]|_)+', '', words[i])
+            if len(normalizedWord) > 0:
+                normalizedHeading.append(normalizedWord)
+
+        if len(normalizedHeading) > 0:
+            # Remove Headings
+            if not all(word[0].isupper() for word in normalizedHeading) and words[-1] != ".":
+                #Lemmatize words
+                sentence = ' '.join([wordnet_lemmatizer.lemmatize(word) for word in words])
+                #sentence = ' '.join([word for word in words])
+                fulltext = ' '.join((fulltext, sentence))
 
     # Join dash-seperated words
     fulltext = fulltext.replace("- ", "")
@@ -64,11 +73,12 @@ def sent_tokenize_file(filename):
     fulltext = expand_contractions(fulltext)
     # Remove et al. from corpus
     fulltext = fulltext.replace(" et al.", "")
+    # Tokenize sentences
     sent_tokenize_list = sent_tokenize(fulltext)
     # Remove punctations
-    # for i in range(len(sent_tokenize_list)):
-    #     words = sent_tokenize_list[i].split()
-    #     sent_tokenize_list[i] = ' '.join([re.sub(r'([^a-zA-Z0-9_]|_)+', '', word) for word in words])
+    #for i in range(len(sent_tokenize_list)):
+         #words = sent_tokenize_list[i].split()
+         #sent_tokenize_list[i] = ' '.join([re.sub(r'([^a-zA-Z0-9_]|_)+', '', word) for word in words])
 
     return sent_tokenize_list
 
