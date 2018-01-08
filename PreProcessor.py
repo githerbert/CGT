@@ -2,7 +2,7 @@
 # import modules & set up logging
 import os, io,re
 from nltk.tokenize import sent_tokenize
-from Definitions import ROOT_DIR, PAPER_DIR
+from Definitions import ROOT_DIR, PAPER_DIR, CODES_PATH
 from nltk.stem import WordNetLemmatizer
 import fnmatch
 from Contractions import CONTRACTIONS_DICT
@@ -40,6 +40,42 @@ def convertEncoding(filename, encoding='utf-8'):
 
     return list
 
+# Extract codes from a file and store them in a list
+def read_codes(filename):
+
+    wordnet_lemmatizer = WordNetLemmatizer()
+    codestring = ""
+
+    readfile = open(filename, encoding='utf16')
+    for line in readfile:
+
+        words = line.split()
+
+        if not all(word[0].isupper() for word in words) and words[-1] != ".":
+
+            #Lemmatize words
+            sentence = ' '.join([wordnet_lemmatizer.lemmatize(word) for word in words])
+            codestring = ' <delimeter> '.join((codestring, sentence))
+
+    # Remove dashes
+    codestring = codestring.replace("-", " ")
+
+    # Remove text between brackets
+    codestring = re.sub("([\(\[]).*?([\)\]])", "\g<1>\g<2>", codestring)
+
+    # Expand contractions
+    codestring = expand_contractions(codestring)
+    # Remove et al. from corpus
+    codestring = codestring.replace(" et al.", "")
+    # Tokenize codes
+    tokenized_codes = codestring.split(' <delimeter> ')
+    # Remove punctations
+    for i in range(len(tokenized_codes)):
+         words = tokenized_codes[i].split()
+         tokenized_codes[i] = ' '.join([re.sub(r'([^a-zA-Z_]|_)+', '', word) for word in words])
+
+    return tokenized_codes
+
 # Extract text from file and store its sentences in a list
 def sent_tokenize_file(filename):
 
@@ -76,9 +112,9 @@ def sent_tokenize_file(filename):
     # Tokenize sentences
     sent_tokenize_list = sent_tokenize(fulltext)
     # Remove punctations
-    #for i in range(len(sent_tokenize_list)):
-         #words = sent_tokenize_list[i].split()
-         #sent_tokenize_list[i] = ' '.join([re.sub(r'([^a-zA-Z0-9_]|_)+', '', word) for word in words])
+    for i in range(len(sent_tokenize_list)):
+         words = sent_tokenize_list[i].split()
+         sent_tokenize_list[i] = ' '.join([re.sub(r'([^a-zA-Z_]|_)+', '', word) for word in words])
 
     return sent_tokenize_list
 
@@ -89,6 +125,9 @@ def expand_contractions(s, contractions_dict=CONTRACTIONS_DICT):
     return contractions_re.sub(replace, s)
 
 contractions_re = re.compile('(%s)' % '|'.join(CONTRACTIONS_DICT.keys()))
+
+for line in read_codes(CODES_PATH):
+    print(line)
 
 #store paths of all main-texts in the given directory to a list
 filelist = iterate_folder(PAPER_DIR)
