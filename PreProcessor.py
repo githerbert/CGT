@@ -3,6 +3,7 @@
 import os, io,re
 from nltk.tokenize import sent_tokenize
 from Definitions import ROOT_DIR, PAPER_DIR
+from nltk.stem import WordNetLemmatizer
 import fnmatch
 from Contractions import CONTRACTIONS_DICT
 
@@ -43,6 +44,7 @@ def convertEncoding(filename, encoding='utf-8'):
 def sent_tokenize_file(filename):
 
     list = convertEncoding(filename)
+    wordnet_lemmatizer = WordNetLemmatizer()
 
     fulltext = ""
 
@@ -50,7 +52,9 @@ def sent_tokenize_file(filename):
         words = line.split()
     # Remove Headings
         if not all(word[0].isupper() for word in words) and words[-1] != ".":
-            sentence = ' '.join([word for word in words])
+            #Lemmatize words
+            sentence = ' '.join([wordnet_lemmatizer.lemmatize(word) for word in words])
+            #sentence = ' '.join([word for word in words])
             fulltext = ' '.join((fulltext, sentence))
 
     # Join dash-seperated words
@@ -61,6 +65,10 @@ def sent_tokenize_file(filename):
     # Remove et al. from corpus
     fulltext = fulltext.replace(" et al.", "")
     sent_tokenize_list = sent_tokenize(fulltext)
+    # Remove punctations
+    # for i in range(len(sent_tokenize_list)):
+    #     words = sent_tokenize_list[i].split()
+    #     sent_tokenize_list[i] = ' '.join([re.sub(r'([^a-zA-Z0-9_]|_)+', '', word) for word in words])
 
     return sent_tokenize_list
 
