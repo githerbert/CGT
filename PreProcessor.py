@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # import modules & set up logging
-import os, io,re
+import os, io,re, nltk
 from nltk.tokenize import sent_tokenize
 from Definitions import ROOT_DIR, PAPER_DIR, CODES_PATH
 from nltk.stem import WordNetLemmatizer
@@ -52,7 +52,6 @@ def read_codes(filename):
         words = line.split()
 
         if not all(word[0].isupper() for word in words) and words[-1] != ".":
-
             #Lemmatize words
             sentence = ' '.join([wordnet_lemmatizer.lemmatize(word) for word in words])
             codestring = ' <delimeter> '.join((codestring, sentence))
@@ -72,7 +71,17 @@ def read_codes(filename):
     # Remove punctations
     for i in range(len(tokenized_codes)):
          words = tokenized_codes[i].split()
-         tokenized_codes[i] = ' '.join([re.sub(r'([^a-zA-Z_]|_)+', '', word) for word in words])
+
+         #Remove verbs at the beginning of the codes
+         tagged_words = []
+
+         for item in words:
+             tokenized = nltk.word_tokenize(item)
+             tagged = nltk.pos_tag(tokenized)
+             if tagged[0][1] != "VBG":
+                 tagged_words.append(tagged[0][0])
+
+         tokenized_codes[i] = ' '.join([re.sub(r'([^a-zA-Z_]|_)+', '', word) for word in tagged_words])
 
     return tokenized_codes
 
@@ -86,7 +95,6 @@ def sent_tokenize_file(filename):
 
     for line in list:
         words = line.split()
-
         #Remove punctutation for heading check
         normalizedHeading = []
         for i in range(len(words)):
