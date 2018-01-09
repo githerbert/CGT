@@ -66,8 +66,6 @@ def read_codes(filename):
     codestring = expand_contractions(codestring)
     # Remove et al. from corpus
     codestring = codestring.replace(" et al.", "")
-    # To lower case
-    codestring = codestring.lower()
     # Tokenize codes
     tokenized_codes = codestring.split(' <delimeter> ')
     # Remove punctations
@@ -119,8 +117,6 @@ def sent_tokenize_file(filename):
     fulltext = expand_contractions(fulltext)
     # Remove et al. from corpus
     fulltext = fulltext.replace(" et al.", "")
-    # To lower case
-    fulltext = fulltext.lower()
     # Tokenize sentences
     sent_tokenize_list = sent_tokenize(fulltext)
     # Remove punctations
