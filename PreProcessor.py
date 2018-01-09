@@ -2,7 +2,7 @@
 # import modules & set up logging
 import os, io,re, nltk
 from nltk.tokenize import sent_tokenize
-from Definitions import ROOT_DIR, PAPER_DIR, CODES_PATH
+from Definitions import ROOT_DIR, PAPER_DIR, CODES_PATH, OS_NAME
 from nltk.corpus import brown
 import fnmatch
 from Contractions import CONTRACTIONS_DICT
@@ -26,9 +26,12 @@ def iterate_folder(root):
 def convertEncoding(filename, encoding='utf-8'):
 
     list = []
-    writefile = open(ROOT_DIR+'\\ConvertEncoding.txt', 'r+', encoding="utf-8-sig")
+    if OS_NAME == "Windows":
+        writefile = io.open(ROOT_DIR+'//ConvertEncoding.txt', 'r+', encoding="utf-8-sig")
+    else:
+        writefile = io.open(ROOT_DIR + '/ConvertEncoding.txt', 'r+', encoding="utf-8-sig")
     writefile.truncate(0)
-    readfile = open(filename, encoding="cp1252")
+    readfile = io.open(filename, encoding="cp1252")
     for line in readfile:
         writefile.write(line)
         writefile.seek(0,0)
@@ -46,7 +49,7 @@ def read_codes(filename):
 
     codestring = ""
 
-    readfile = open(filename, encoding='utf16')
+    readfile = io.open(filename, encoding='utf16')
     for line in readfile:
 
         words = line.split()
