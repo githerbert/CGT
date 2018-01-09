@@ -4,6 +4,7 @@ import os, io,re, nltk
 from nltk.tokenize import sent_tokenize
 from Definitions import ROOT_DIR, PAPER_DIR, CODES_PATH
 from nltk.stem import WordNetLemmatizer
+from nltk.corpus import brown
 import fnmatch
 from Contractions import CONTRACTIONS_DICT
 
@@ -90,6 +91,8 @@ def sent_tokenize_file(filename):
 
     list = convertEncoding(filename)
     wordnet_lemmatizer = WordNetLemmatizer()
+    word_list = brown.words()
+    word_set = set(word_list)
 
     fulltext = ""
 
@@ -119,12 +122,27 @@ def sent_tokenize_file(filename):
     fulltext = fulltext.replace(" et al.", "")
     # Tokenize sentences
     sent_tokenize_list = sent_tokenize(fulltext)
-    # Remove punctations
+    cleared_list = []
+
     for i in range(len(sent_tokenize_list)):
+         # Remove punctations
          words = sent_tokenize_list[i].split()
          sent_tokenize_list[i] = ' '.join([re.sub(r'([^a-zA-Z_]|_)+', '', word) for word in words])
+         words = sent_tokenize_list[i].split()
+         validWords = False
+         letters = False
+         for word in words:
+             # Remove sententeces that contain no valid words
+             if word in word_set:
+                 validWords = True
+             # Remove sententeces that contain letters only
+             if len(word) > 1:
+                 letters = True
+         if validWords == True and letters == True:
+             cleared_list.append(' '.join(words))
+    print("p" in word_set)
 
-    return sent_tokenize_list
+    return cleared_list
 
 
 def expand_contractions(s, contractions_dict=CONTRACTIONS_DICT):
