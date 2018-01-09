@@ -3,10 +3,10 @@
 import os, io,re, nltk
 from nltk.tokenize import sent_tokenize
 from Definitions import ROOT_DIR, PAPER_DIR, CODES_PATH
-from nltk.stem import WordNetLemmatizer
 from nltk.corpus import brown
 import fnmatch
 from Contractions import CONTRACTIONS_DICT
+from Abbrevations import ABBREVATIONS_DICT
 
 # iterate through all subdirectories recusively and store all Main texts to a list
 def iterate_folder(root):
@@ -44,7 +44,6 @@ def convertEncoding(filename, encoding='utf-8'):
 # Extract codes from a file and store them in a list
 def read_codes(filename):
 
-    wordnet_lemmatizer = WordNetLemmatizer()
     codestring = ""
 
     readfile = open(filename, encoding='utf16')
@@ -54,7 +53,7 @@ def read_codes(filename):
 
         if not all(word[0].isupper() for word in words) and words[-1] != ".":
             #Lemmatize words
-            sentence = ' '.join([wordnet_lemmatizer.lemmatize(word) for word in words])
+            sentence = ' '.join([word for word in words])
             codestring = ' <delimeter> '.join((codestring, sentence))
 
     # Remove dashes
@@ -90,7 +89,6 @@ def read_codes(filename):
 def sent_tokenize_file(filename):
 
     list = convertEncoding(filename)
-    wordnet_lemmatizer = WordNetLemmatizer()
     word_list = brown.words()
     word_set = set(word_list)
 
@@ -109,7 +107,7 @@ def sent_tokenize_file(filename):
             # Remove Headings
             if not all(word[0].isupper() for word in normalizedHeading) and words[-1] != ".":
                 #Lemmatize words
-                sentence = ' '.join([wordnet_lemmatizer.lemmatize(word) for word in words])
+                sentence = ' '.join([word for word in words])
                 #sentence = ' '.join([word for word in words])
                 fulltext = ' '.join((fulltext, sentence))
 
@@ -118,6 +116,8 @@ def sent_tokenize_file(filename):
     fulltext = fulltext.replace(u"\u2013 ", "")
     # Expand contractions
     fulltext = expand_contractions(fulltext)
+    # Expand abbrevations
+    fulltext = expand_abbrevations(fulltext)
     # Remove et al. from corpus
     fulltext = fulltext.replace(" et al.", "")
     # Tokenize sentences
@@ -138,9 +138,8 @@ def sent_tokenize_file(filename):
              # Remove sententeces that contain letters only
              if len(word) > 1:
                  letters = True
-         if validWords == True and letters == True:
+         if validWords == True and letters == True and len(words)>1:
              cleared_list.append(' '.join(words))
-    print("p" in word_set)
 
     return cleared_list
 
@@ -149,6 +148,12 @@ def expand_contractions(s, contractions_dict=CONTRACTIONS_DICT):
     def replace(match):
         return contractions_dict[match.group(0)]
     return contractions_re.sub(replace, s)
+
+def expand_abbrevations(s, abbrevations_dict=ABBREVATIONS_DICT):
+
+    for key in abbrevations_dict:
+        s = s.replace(key,abbrevations_dict[key])
+    return s
 
 contractions_re = re.compile('(%s)' % '|'.join(CONTRACTIONS_DICT.keys()))
 
