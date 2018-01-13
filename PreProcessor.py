@@ -3,7 +3,7 @@
 import os, io,re, nltk
 from nltk.tokenize import sent_tokenize
 from Definitions import ROOT_DIR, PAPER_DIR, CODES_PATH, OS_NAME
-from nltk.corpus import brown
+from nltk.corpus import brown, stopwords
 import fnmatch
 from Contractions import CONTRACTIONS_DICT
 from Abbrevations import ABBREVATIONS_DICT
@@ -114,23 +114,29 @@ def sent_tokenize_file(filename):
                 #sentence = ' '.join([word for word in words])
                 fulltext = ' '.join((fulltext, sentence))
 
-    # Join dash-seperated words
-    fulltext = fulltext.replace("- ", "")
-    fulltext = fulltext.replace(u"\u2013 ", "")
-    # Expand contractions
-    fulltext = expand_contractions(fulltext)
-    # Expand abbrevations
-    fulltext = expand_abbrevations(fulltext)
     # Remove et al. from corpus
     fulltext = fulltext.replace(" et al.", "")
     # Tokenize sentences
     sent_tokenize_list = sent_tokenize(fulltext)
+    sent_tokenize_list_copy = sent_tokenize_list[:]
+
     cleared_list = []
+    original_list = []
 
     for i in range(len(sent_tokenize_list)):
-         # Remove punctations
          words = sent_tokenize_list[i].split()
-         sent_tokenize_list[i] = ' '.join([re.sub(r'([^a-zA-Z_]|_)+', '', word) for word in words])
+         for j in range(len(words)):
+             words[j] = remove_stopword(words[j])
+             # Join dash-seperated words
+             words[j] = words[j].replace("- ", "")
+             words[j] = words[j].replace(u"\u2013 ", "")
+             # Expand contractions
+             words[j] = expand_contractions(words[j])
+             # Expand abbrevations
+             words[j] = expand_abbrevations(words[j])
+             # Remove punctations and numbers
+             words[j] = re.sub(r'([^a-zA-Z_]|_)+', '', words[j])
+         sent_tokenize_list[i] = ' '.join(words)
          words = sent_tokenize_list[i].split()
          validWords = False
          letters = False
@@ -143,8 +149,13 @@ def sent_tokenize_file(filename):
                  letters = True
          if validWords == True and letters == True and len(words)>1:
              cleared_list.append(' '.join(words))
+             original_list.append(sent_tokenize_list_copy[i])
 
-    return cleared_list
+    final_list = []
+    final_list.append(cleared_list)
+    final_list.append(original_list)
+
+    return final_list
 
 
 def expand_contractions(s, contractions_dict=CONTRACTIONS_DICT):
@@ -158,7 +169,15 @@ def expand_abbrevations(s, abbrevations_dict=ABBREVATIONS_DICT):
         s = s.replace(key,abbrevations_dict[key])
     return s
 
+def remove_stopword(s):
+
+    if s in stop_words or (s[0].lower() + s[1:]) in stop_words:
+        s = ""
+
+    return s
+
 contractions_re = re.compile('(%s)' % '|'.join(CONTRACTIONS_DICT.keys()))
+stop_words = set(stopwords.words('english'))
 
 for line in read_codes(CODES_PATH):
     print(line)
@@ -174,8 +193,11 @@ i = 0
 for file in filelist:
     i+=1
     print(i)
-    for line in sent_tokenize_file(file):
-        print(line)
+    sent_list = sent_tokenize_file(file)
+    print(sent_list[0])
+    print(sent_list[1])
+    #for line in sent_list[0]:
+     #   print(line)
 
 # //store the sentences in a file
 # writefile = io.open('S:\\VMs\\Shared\\Maindata.txt', 'w', encoding="utf-8-sig")
