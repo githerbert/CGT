@@ -4,5 +4,6 @@ ABBREVATIONS_DICT = {
 "e.g.": "for example",
 "etc.": "and so forth",
 "viz.": "namely",
-"vs.": "against"
+"vs.": "against",
+"IT": "information technology"
 }

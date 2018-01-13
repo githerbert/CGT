@@ -68,11 +68,19 @@ def read_codes(filename):
          # Remove dashes
          cleared_code_list[i] = cleared_code_list[i].replace("-", " ")
 
+
          # Remove text between brackets
          cleared_code_list[i] = re.sub("([\(\[]).*?([\)\]])", "\g<1>\g<2>", cleared_code_list[i])
 
          # Expand contractions
          cleared_code_list[i] = expand_contractions(cleared_code_list[i])
+
+         # Expand abbrevations
+         cleared_code_list[i] = expand_abbrevations(cleared_code_list[i])
+
+         # lowercasing
+         cleared_code_list[i] = cleared_code_list[i].lower()
+
 
          words = cleared_code_list[i].split()
 
@@ -139,17 +147,20 @@ def sent_tokenize_file(filename):
     original_list = []
 
     for i in range(len(sent_tokenize_list)):
+         # Join dash-seperated words
+         sent_tokenize_list[i] = sent_tokenize_list[i].replace("- ", "")
+         sent_tokenize_list[i] = sent_tokenize_list[i].replace(u"\u2013 ", "")
+         # Expand contractions
+         sent_tokenize_list[i] = expand_contractions(sent_tokenize_list[i])
+         # Expand abbrevations
+         sent_tokenize_list[i] = expand_abbrevations(sent_tokenize_list[i])
+         # lowercasing
+         sent_tokenize_list[i] = sent_tokenize_list[i].lower()
+
          words = sent_tokenize_list[i].split()
          for j in range(len(words)):
              # Remove Stop Words
              words[j] = remove_stopword(words[j])
-             # Join dash-seperated words
-             words[j] = words[j].replace("- ", "")
-             words[j] = words[j].replace(u"\u2013 ", "")
-             # Expand contractions
-             words[j] = expand_contractions(words[j])
-             # Expand abbrevations
-             words[j] = expand_abbrevations(words[j])
              # Remove punctations and numbers
              words[j] = re.sub(r'([^a-zA-Z_]|_)+', '', words[j])
          sent_tokenize_list[i] = ' '.join(words)
