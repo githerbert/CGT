@@ -47,33 +47,34 @@ def convertEncoding(filename, encoding='utf-8'):
 # Extract codes from a file and store them in a list
 def read_codes(filename):
 
-    codestring = ""
-
     readfile = io.open(filename, encoding='utf16')
+
+    cleared_code_list = []
+
     for line in readfile:
 
         words = line.split()
 
         if not all(word[0].isupper() for word in words) and words[-1] != ".":
-            #Lemmatize words
+
             sentence = ' '.join([word for word in words])
-            codestring = ' <delimeter> '.join((codestring, sentence))
+            cleared_code_list.append(sentence)
 
-    # Remove dashes
-    codestring = codestring.replace("-", " ")
+    # Original codes
+    original_codes = cleared_code_list[:]
 
-    # Remove text between brackets
-    codestring = re.sub("([\(\[]).*?([\)\]])", "\g<1>\g<2>", codestring)
+    for i in range(len(cleared_code_list)):
 
-    # Expand contractions
-    codestring = expand_contractions(codestring)
-    # Remove et al. from corpus
-    codestring = codestring.replace(" et al.", "")
-    # Tokenize codes
-    tokenized_codes = codestring.split(' <delimeter> ')
-    # Remove punctations
-    for i in range(len(tokenized_codes)):
-         words = tokenized_codes[i].split()
+         # Remove dashes
+         cleared_code_list[i] = cleared_code_list[i].replace("-", " ")
+
+         # Remove text between brackets
+         cleared_code_list[i] = re.sub("([\(\[]).*?([\)\]])", "\g<1>\g<2>", cleared_code_list[i])
+
+         # Expand contractions
+         cleared_code_list[i] = expand_contractions(cleared_code_list[i])
+
+         words = cleared_code_list[i].split()
 
          #Remove verbs at the beginning of the codes
          tagged_words = []
@@ -84,9 +85,25 @@ def read_codes(filename):
              if tagged[0][1] != "VBG":
                  tagged_words.append(tagged[0][0])
 
-         tokenized_codes[i] = ' '.join([re.sub(r'([^a-zA-Z_]|_)+', '', word) for word in tagged_words])
+         cleared_words=[]
 
-    return tokenized_codes
+         for j in range(len(tagged_words)):
+             tagged_words[j] = remove_stopword(tagged_words[j])
+             # Remove punctations
+             tagged_words[j] = re.sub(r'([^a-zA-Z_]|_)+', '', tagged_words[j])
+
+         #Remove redundant whitespaces
+         cleared_code_list[i] = ' '.join(tagged_words)
+
+         cleared_words = cleared_code_list[i].split()
+
+         cleared_code_list[i] = ' '.join(cleared_words)
+
+    final_codes = []
+    final_codes.append(cleared_code_list)
+    final_codes.append(original_codes)
+
+    return final_codes
 
 # Extract text from file and store its sentences in a list
 def sent_tokenize_file(filename):
@@ -109,9 +126,7 @@ def sent_tokenize_file(filename):
         if len(normalizedHeading) > 0:
             # Remove Headings
             if not all(word[0].isupper() for word in normalizedHeading) and words[-1] != ".":
-                #Lemmatize words
                 sentence = ' '.join([word for word in words])
-                #sentence = ' '.join([word for word in words])
                 fulltext = ' '.join((fulltext, sentence))
 
     # Remove et al. from corpus
@@ -126,6 +141,7 @@ def sent_tokenize_file(filename):
     for i in range(len(sent_tokenize_list)):
          words = sent_tokenize_list[i].split()
          for j in range(len(words)):
+             # Remove Stop Words
              words[j] = remove_stopword(words[j])
              # Join dash-seperated words
              words[j] = words[j].replace("- ", "")
@@ -171,7 +187,7 @@ def expand_abbrevations(s, abbrevations_dict=ABBREVATIONS_DICT):
 
 def remove_stopword(s):
 
-    if s in stop_words or (s[0].lower() + s[1:]) in stop_words:
+    if (s[0].lower() + s[1:]) in stop_words:
         s = ""
 
     return s
