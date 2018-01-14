@@ -147,9 +147,7 @@ def sent_tokenize_file(filename):
     original_list = []
 
     for i in range(len(sent_tokenize_list)):
-         # Join dash-seperated words
-         sent_tokenize_list[i] = sent_tokenize_list[i].replace("- ", "")
-         sent_tokenize_list[i] = sent_tokenize_list[i].replace(u"\u2013 ", "")
+
          # Expand contractions
          sent_tokenize_list[i] = expand_contractions(sent_tokenize_list[i])
          # Expand abbrevations
@@ -158,9 +156,33 @@ def sent_tokenize_file(filename):
          sent_tokenize_list[i] = sent_tokenize_list[i].lower()
 
          words = sent_tokenize_list[i].split()
+
          for j in range(len(words)):
+
+             # Join dash-seperated words if valid words are seperated
+             if len(words[j]) > 0 and words[j][-1] == ("-") and j+1 < len(words):
+                 if (re.sub(r'([^a-zA-Z_]|_)+', '', words[j]) + re.sub(r'([^a-zA-Z_]|_)+', '', words[j+1])) in word_set:
+                     words[j] = words[j].replace("-", "") + words[j+1]
+                     words[j+1] = ""
+             if len(words[j]) > 0 and words[j][-1] == (u"\u2013") in words[j] and j+1 < len(words):
+                 if (re.sub(r'([^a-zA-Z_]|_)+', '', words[j]) + re.sub(r'([^a-zA-Z_]|_)+', '', words[j + 1])) in word_set:
+                    words[j] = words[j].replace(u"\u2013", "") + words[j+1]
+                    words[j+1] = ""
+
              # Remove Stop Words
              words[j] = remove_stopword(words[j])
+
+         sent_tokenize_list[i] = ' '.join(words)
+
+         # Replace dashes with whitespace
+         sent_tokenize_list[i] = sent_tokenize_list[i].replace("-", " ")
+         sent_tokenize_list[i] = sent_tokenize_list[i].replace(u"\u2013", " ")
+
+         sent_tokenize_list[i] = expand_abbrevations(sent_tokenize_list[i])
+
+         words = sent_tokenize_list[i].split()
+
+         for j in range(len(words)):
              # Remove punctations and numbers
              words[j] = re.sub(r'([^a-zA-Z_]|_)+', '', words[j])
          sent_tokenize_list[i] = ' '.join(words)
@@ -198,7 +220,7 @@ def expand_abbrevations(s, abbrevations_dict=ABBREVATIONS_DICT):
 
 def remove_stopword(s):
 
-    if (s[0].lower() + s[1:]) in stop_words:
+    if len(s) > 0 and (s[0].lower() + s[1:]) in stop_words:
         s = ""
 
     return s
