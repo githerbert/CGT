@@ -12,6 +12,7 @@ from textblob.taggers import NLTKTagger
 import time
 import spacy
 import csv
+from paper import Paper
 
 # iterate through all subdirectories recusively and store all Main texts to a list
 def iterate_folder(root):
@@ -298,9 +299,12 @@ def paper_to_list():
         i += 1
         print(i)
         sent_list = sent_tokenize_file(file)
-        preprocessed_paper_list.append(sent_list)
+        paper = Paper(i,sent_list[0],sent_list[1])
+        preprocessed_paper_list.append(paper)
 
     return preprocessed_paper_list
+
+print(paper_to_list())
 
 
 
