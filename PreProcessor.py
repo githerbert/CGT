@@ -11,6 +11,7 @@ from textblob import TextBlob, Word
 from textblob.taggers import NLTKTagger
 import time
 import spacy
+import csv
 
 # iterate through all subdirectories recusively and store all Main texts to a list
 def iterate_folder(root):
@@ -255,22 +256,53 @@ stop_words = set(stopwords.words('english'))
 for line in read_codes(CODES_PATH):
     print(line)
 
-#store paths of all main-texts in the given directory to a list
-filelist = iterate_folder(PAPER_DIR)
+
+def csvexport():
+
+    #store paths of all main-texts in the given directory to a list
+    filelist = iterate_folder(PAPER_DIR)
 
 
-# number of the paper
-i = 0
+    # number of the paper
+    i = 0
+        #for line in sent_list[0]:
+         #   print(line)
+    with open('paper_export.csv','w') as f:
+        # iterate through all main texts and print their sentences
+        for file in filelist:
+            i += 1
+            print(i)
+            sent_list = sent_tokenize_file(file)
+            print(sent_list[0])
+            print(sent_list[1])
 
-# iterate through all main texts and print their sentences
-for file in filelist:
-    i+=1
-    print(i)
-    sent_list = sent_tokenize_file(file)
-    print(sent_list[0])
-    print(sent_list[1])
-    #for line in sent_list[0]:
-     #   print(line)
+            j = 0
+            f.write("Paper_ID;PreProcessed;Original")
+            f.write('\n')
+            for item in sent_list[0]:
+                f.write(sent_list[0][j].encode('utf-8') + ';'+ sent_list[1][j].encode('utf-8-sig'))
+                f.write('\n')
+                j = j + 1
+
+def paper_to_list():
+
+    filelist = iterate_folder(PAPER_DIR)
+
+    # number of the paper
+    i = 0
+
+    preprocessed_paper_list = []
+
+    # iterate through all main texts and print their sentences
+    for file in filelist:
+        i += 1
+        print(i)
+        sent_list = sent_tokenize_file(file)
+        preprocessed_paper_list.append(sent_list)
+
+    return preprocessed_paper_list
+
+
 
 # //store the sentences in a file
 # writefile = io.open('S:\\VMs\\Shared\\Maindata.txt', 'w', encoding="utf-8-sig")
