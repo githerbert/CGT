@@ -11,8 +11,8 @@ from textblob import TextBlob, Word
 from textblob.taggers import NLTKTagger
 import time
 import spacy
-import csv
 from paper import Paper
+import unicodecsv
 
 # iterate through all subdirectories recusively and store all Main texts to a list
 def iterate_folder(root):
@@ -116,8 +116,8 @@ def read_codes(filename):
          cleared_code_list[i] = ' '.join(cleared_words)
 
     final_codes = []
-    final_codes.append(cleared_code_list)
     final_codes.append(original_codes)
+    final_codes.append(cleared_code_list)
 
     return final_codes
 
@@ -147,6 +147,8 @@ def sent_tokenize_file(filename):
 
     # Remove et al. from corpus
     fulltext = fulltext.replace(" et al.", "")
+    # Expand abbrevations
+    fulltext = expand_abbrevations(fulltext)
     # Tokenize sentences
     sent_tokenize_list = sent_tokenize(fulltext)
     sent_tokenize_list_copy = sent_tokenize_list[:]
@@ -158,8 +160,7 @@ def sent_tokenize_file(filename):
 
          # Expand contractions
          sent_tokenize_list[i] = expand_contractions(sent_tokenize_list[i])
-         # Expand abbrevations
-         sent_tokenize_list[i] = expand_abbrevations(sent_tokenize_list[i])
+
          # lowercasing
          sent_tokenize_list[i] = sent_tokenize_list[i].lower()
 
@@ -228,8 +229,8 @@ def sent_tokenize_file(filename):
              original_list.append(sent_tokenize_list_copy[i])
 
     final_list = []
-    final_list.append(cleared_list)
     final_list.append(original_list)
+    final_list.append(cleared_list)
     print("--- %s seconds ---" % (time.time() - start_time))
     return final_list
 
@@ -251,6 +252,7 @@ def remove_stopword(s):
         s = ""
 
     return s
+
 start_time = time.time()
 nlp = spacy.load('en', disable=['parser', 'ner', 'textcat'])
 print(nlp.pipeline)
@@ -274,7 +276,6 @@ def csvexport():
     with open('paper_export.csv','w') as f:
         # iterate through all main texts and print their sentences
         for file in filelist:
-            i += 1
             print(i)
             sent_list = sent_tokenize_file(file)
             print(sent_list[0])
@@ -284,9 +285,21 @@ def csvexport():
             f.write("Paper_ID;PreProcessed;Original")
             f.write('\n')
             for item in sent_list[0]:
-                f.write(sent_list[0][j].encode('utf-8') + ';'+ sent_list[1][j].encode('utf-8-sig'))
+                f.write(str(i).encode('utf-8') + ';' + sent_list[0][j].encode('utf-8') + ';'+ sent_list[1][j].encode('utf-8-sig'))
                 f.write('\n')
                 j = j + 1
+            
+            i += 1
+
+def csvimport():
+
+    preprocessed_paper_list = []
+
+    myfile = open('paper_export.csv')
+    data = unicodecsv.reader(myfile, encoding='utf-8', delimiter=';')
+    for row in data:
+        paper = Paper(row[0], row[1], row[2])
+        print (row[2])
 
 def paper_to_list():
 
@@ -307,7 +320,9 @@ def paper_to_list():
 
     return preprocessed_paper_list
 
-print(paper_to_list())
+#csvimport()
+#csvexport()
+print(paper_to_list()[0].cleared_paper)
 
 
 

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# import modules & set up logging
 
 ABBREVATIONS_DICT = {
 "i.e.": "that is",
