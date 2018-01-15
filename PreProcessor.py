@@ -7,10 +7,10 @@ from nltk.corpus import brown, stopwords
 import fnmatch
 from Contractions import CONTRACTIONS_DICT
 from Abbrevations import ABBREVATIONS_DICT
-from textblob import TextBlob
-from textblob import Word
+from textblob import TextBlob, Word
 from textblob.taggers import NLTKTagger
 import time
+import spacy
 
 # iterate through all subdirectories recusively and store all Main texts to a list
 def iterate_folder(root):
@@ -89,15 +89,16 @@ def read_codes(filename):
 
          tagged_words = []
 
-         blob = TextBlob(cleared_code_list[i], pos_tagger=nltk_tagger)
+         doc = nlp(cleared_code_list[i])
 
-         for item in blob.pos_tags:
-             (word, tag) = item
+         for item in doc:
+             word = item.text
+             tag = item.tag_
              if tag != "VBG":
                  if tag == "NNS":
-                     word = word.singularize()
+                     word = Word(word).singularize()
                  if "VB" in tag:
-                     word = word.lemmatize("v")
+                     word = item.lemma_
                  tagged_words.append(word)
 
          for j in range(len(tagged_words)):
@@ -184,15 +185,16 @@ def sent_tokenize_file(filename):
 
          norm_word_list = []
 
-         blob = TextBlob(sent_tokenize_list[i], pos_tagger=nltk_tagger)
+         doc = nlp(sent_tokenize_list[i])
 
-         for item in blob.pos_tags:
-            (word, tag) = item
-            if tag == "NNS":
-                word = word.singularize()
-            if "VB" in tag:
-                word = word.lemmatize("v")
-            norm_word_list.append(word)
+         for item in doc:
+             word = item.text
+             tag = item.tag_
+             if tag == "NNS":
+                 word = Word(word).singularize()
+             if "VB" in tag:
+                 word = item.lemma_
+             norm_word_list.append(word)
 
          sent_tokenize_list[i] = ' '.join(norm_word_list)
 
@@ -222,7 +224,7 @@ def sent_tokenize_file(filename):
     final_list = []
     final_list.append(cleared_list)
     final_list.append(original_list)
-
+    print("--- %s seconds ---" % (time.time() - start_time))
     return final_list
 
 
@@ -243,10 +245,12 @@ def remove_stopword(s):
         s = ""
 
     return s
-
+start_time = time.time()
+nlp = spacy.load('en', disable=['parser', 'ner', 'textcat'])
+print(nlp.pipeline)
 contractions_re = re.compile('(%s)' % '|'.join(CONTRACTIONS_DICT.keys()))
 stop_words = set(stopwords.words('english'))
-start_time = time.time()
+
 for line in read_codes(CODES_PATH):
     print(line)
 
@@ -266,7 +270,7 @@ for file in filelist:
     print(sent_list[1])
     #for line in sent_list[0]:
      #   print(line)
-    print("--- %s seconds ---" % (time.time() - start_time))
+
 # //store the sentences in a file
 # writefile = io.open('S:\\VMs\\Shared\\Maindata.txt', 'w', encoding="utf-8-sig")
 # for file in filelist:
