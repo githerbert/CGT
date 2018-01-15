@@ -12,6 +12,7 @@ from textblob.taggers import NLTKTagger
 import time
 import spacy
 from paper import Paper
+from score import Score
 import unicodecsv
 
 # iterate through all subdirectories recusively and store all Main texts to a list
@@ -322,7 +323,19 @@ def paper_to_list():
 
 #csvimport()
 #csvexport()
-print(paper_to_list()[0].cleared_paper)
+#print(paper_to_list()[0].cleared_paper)
+
+inferSentscore = Score()
+
+inferSentscore.addScore(0,2,3,0.5)
+inferSentscore.addScore(2,9,5,0.6)
+
+for tupel in inferSentscore.scorelist:
+    print tupel[2]
+
+print([elem for elem in inferSentscore.scorelist if elem[3] >= 0.6])
+
+print(inferSentscore.scorelist)
 
 
 

@@ -4,5 +4,6 @@ class Score:
 
         self.scorelist = []
 
-    def addScore(self, code_id, paper_id, score):
-        self.scorelist.append(code_id,paper_id,score)
+    def addScore(self, code_id, paper_id, sent_id ,score):
+        my_tuple = (code_id, paper_id, sent_id, score)
+        self.scorelist.append(my_tuple)
