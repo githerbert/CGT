@@ -102,7 +102,7 @@ def read_codes(filename):
                  tagged_words.append(word)
 
          for j in range(len(tagged_words)):
-             tagged_words[j] = remove_stopword(tagged_words[j])
+             #tagged_words[j] = remove_stopword(tagged_words[j])
              # Remove punctations
              tagged_words[j] = re.sub(r'([^a-zA-Z_]|_)+', '', tagged_words[j])
 
@@ -122,7 +122,6 @@ def read_codes(filename):
 # Extract text from file and store its sentences in a list
 def sent_tokenize_file(filename):
 
-    nltk_tagger = NLTKTagger()
     list = convertEncoding(filename)
     word_list = brown.words()
     word_set = set(word_list)
@@ -191,9 +190,9 @@ def sent_tokenize_file(filename):
              word = item.text
              tag = item.tag_
              if tag == "NNS":
-                 word = Word(word).singularize()
+                word = Word(word).singularize()
              if "VB" in tag:
-                 word = item.lemma_
+                word = item.lemma_
              norm_word_list.append(word)
 
          sent_tokenize_list[i] = ' '.join(norm_word_list)
@@ -202,7 +201,7 @@ def sent_tokenize_file(filename):
 
          for j in range(len(words)):
              # Remove Stop Words
-             words[j] = remove_stopword(words[j])
+             #words[j] = remove_stopword(words[j])
              # Remove punctations and numbers
              words[j] = re.sub(r'([^a-zA-Z_]|_)+', '', words[j])
          sent_tokenize_list[i] = ' '.join(words)
