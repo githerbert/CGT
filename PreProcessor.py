@@ -184,6 +184,9 @@ def sent_tokenize_file(filename):
          sent_tokenize_list[i] = sent_tokenize_list[i].replace("-", " ")
          sent_tokenize_list[i] = sent_tokenize_list[i].replace(u"\u2013", " ")
 
+         # Replace slashes with whitespace
+         sent_tokenize_list[i] = sent_tokenize_list[i].replace("/", " ")
+
          sent_tokenize_list[i] = sent_tokenize_list[i].replace(u"\u2019", "")
 
          norm_word_list = []
