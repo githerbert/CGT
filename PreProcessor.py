@@ -7,6 +7,10 @@ from nltk.corpus import brown, stopwords
 import fnmatch
 from Contractions import CONTRACTIONS_DICT
 from Abbrevations import ABBREVATIONS_DICT
+from textblob import TextBlob
+from textblob import Word
+from textblob.taggers import NLTKTagger
+import time
 
 # iterate through all subdirectories recusively and store all Main texts to a list
 def iterate_folder(root):
@@ -47,6 +51,8 @@ def convertEncoding(filename, encoding='utf-8'):
 # Extract codes from a file and store them in a list
 def read_codes(filename):
 
+    nltk_tagger = NLTKTagger()
+
     readfile = io.open(filename, encoding='utf16')
 
     cleared_code_list = []
@@ -81,19 +87,18 @@ def read_codes(filename):
          # lowercasing
          cleared_code_list[i] = cleared_code_list[i].lower()
 
-
-         words = cleared_code_list[i].split()
-
-         #Remove verbs at the beginning of the codes
          tagged_words = []
 
-         for item in words:
-             tokenized = nltk.word_tokenize(item)
-             tagged = nltk.pos_tag(tokenized)
-             if tagged[0][1] != "VBG":
-                 tagged_words.append(tagged[0][0])
+         blob = TextBlob(cleared_code_list[i], pos_tagger=nltk_tagger)
 
-         cleared_words=[]
+         for item in blob.pos_tags:
+             (word, tag) = item
+             if tag != "VBG":
+                 if tag == "NNS":
+                     word = word.singularize()
+                 if "VB" in tag:
+                     word = word.lemmatize("v")
+                 tagged_words.append(word)
 
          for j in range(len(tagged_words)):
              tagged_words[j] = remove_stopword(tagged_words[j])
@@ -116,6 +121,7 @@ def read_codes(filename):
 # Extract text from file and store its sentences in a list
 def sent_tokenize_file(filename):
 
+    nltk_tagger = NLTKTagger()
     list = convertEncoding(filename)
     word_list = brown.words()
     word_set = set(word_list)
@@ -169,8 +175,6 @@ def sent_tokenize_file(filename):
                     words[j] = words[j].replace(u"\u2013", "") + words[j+1]
                     words[j+1] = ""
 
-             # Remove Stop Words
-             words[j] = remove_stopword(words[j])
 
          sent_tokenize_list[i] = ' '.join(words)
 
@@ -178,14 +182,29 @@ def sent_tokenize_file(filename):
          sent_tokenize_list[i] = sent_tokenize_list[i].replace("-", " ")
          sent_tokenize_list[i] = sent_tokenize_list[i].replace(u"\u2013", " ")
 
-         sent_tokenize_list[i] = expand_abbrevations(sent_tokenize_list[i])
+         norm_word_list = []
+
+         blob = TextBlob(sent_tokenize_list[i], pos_tagger=nltk_tagger)
+
+         for item in blob.pos_tags:
+            (word, tag) = item
+            if tag == "NNS":
+                word = word.singularize()
+            if "VB" in tag:
+                word = word.lemmatize("v")
+            norm_word_list.append(word)
+
+         sent_tokenize_list[i] = ' '.join(norm_word_list)
 
          words = sent_tokenize_list[i].split()
 
          for j in range(len(words)):
+             # Remove Stop Words
+             words[j] = remove_stopword(words[j])
              # Remove punctations and numbers
              words[j] = re.sub(r'([^a-zA-Z_]|_)+', '', words[j])
          sent_tokenize_list[i] = ' '.join(words)
+
          words = sent_tokenize_list[i].split()
          validWords = False
          letters = False
@@ -227,7 +246,7 @@ def remove_stopword(s):
 
 contractions_re = re.compile('(%s)' % '|'.join(CONTRACTIONS_DICT.keys()))
 stop_words = set(stopwords.words('english'))
-
+start_time = time.time()
 for line in read_codes(CODES_PATH):
     print(line)
 
@@ -247,7 +266,7 @@ for file in filelist:
     print(sent_list[1])
     #for line in sent_list[0]:
      #   print(line)
-
+    print("--- %s seconds ---" % (time.time() - start_time))
 # //store the sentences in a file
 # writefile = io.open('S:\\VMs\\Shared\\Maindata.txt', 'w', encoding="utf-8-sig")
 # for file in filelist:
