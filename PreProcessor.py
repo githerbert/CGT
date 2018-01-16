@@ -12,6 +12,7 @@ from textblob.taggers import NLTKTagger
 import time
 import spacy
 from paper import Paper
+from code import Code
 from score import Score
 import unicodecsv
 
@@ -260,9 +261,13 @@ print(nlp.pipeline)
 contractions_re = re.compile('(%s)' % '|'.join(CONTRACTIONS_DICT.keys()))
 stop_words = set(stopwords.words('english'))
 
-for line in read_codes(CODES_PATH):
-    print(line)
-
+def code_to_list():
+	codes = []
+	codelist = read_codes(CODES_PATH)
+	for i in range(len(codelist[0])):
+		code = Code(i,codelist[0][i],codelist[1][i])
+    		codes.append(code)
+	return codes
 
 def csvexport():
 
@@ -324,6 +329,7 @@ def paper_to_list():
 #csvimport()
 #csvexport()
 #print(paper_to_list()[0].cleared_paper)
+
 
 inferSentscore = Score()
 
