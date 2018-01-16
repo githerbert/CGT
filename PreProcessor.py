@@ -303,9 +303,21 @@ def csvimport():
 
     myfile = open('paper_export.csv')
     data = unicodecsv.reader(myfile, encoding='utf-8', delimiter=';')
+    data.next()
+    
+    # Create a paper every time a line with new paper_id is red
+    flag = -1
+    
     for row in data:
-        paper = Paper(row[0], row[1], row[2])
-        print (row[2])
+	if int(row[0]) != flag:
+		paper = Paper(int(row[0]),[],[])
+		preprocessed_paper_list.append(paper)
+		flag == row[0]
+	preprocessed_paper_list[int(row[0])].original_paper.append(row[1])
+	preprocessed_paper_list[int(row[0])].cleared_paper.append(row[2])
+
+    return preprocessed_paper_list
+
 
 def paper_to_list():
 
@@ -318,32 +330,18 @@ def paper_to_list():
 
     # iterate through all main texts and print their sentences
     for file in filelist:
-        i += 1
+        
         print(i)
         sent_list = sent_tokenize_file(file)
         paper = Paper(i,sent_list[0],sent_list[1])
         preprocessed_paper_list.append(paper)
+	i += 1
 
     return preprocessed_paper_list
 
 #csvimport()
 #csvexport()
 #print(paper_to_list()[0].cleared_paper)
-
-
-inferSentscore = Score()
-
-inferSentscore.addScore(0,2,3,0.5)
-inferSentscore.addScore(2,9,5,0.6)
-
-for tupel in inferSentscore.scorelist:
-    print tupel[2]
-
-print([elem for elem in inferSentscore.scorelist if elem[3] >= 0.6])
-
-print(inferSentscore.scorelist)
-
-
 
 # //store the sentences in a file
 # writefile = io.open('S:\\VMs\\Shared\\Maindata.txt', 'w', encoding="utf-8-sig")
