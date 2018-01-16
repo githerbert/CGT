@@ -7,9 +7,11 @@ def main():
     print("Programm is starting...")
    # for code in PreProcessor.code_to_list():
 	#print(code.cleared_code)
-    for paper in PreProcessor.csvimport():
-	for line in paper.original_paper:
-		print (line)
+    score = np.zeros(shape=(50,3))
+    score[25,0] = 150
+    print(score)
+    print(score.max(axis=0)[0])
+   
     
 
 if __name__ == "__main__":
