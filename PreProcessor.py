@@ -282,10 +282,8 @@ def csvexport():
     with open('paper_export.csv','w') as f:
         # iterate through all main texts and print their sentences
         for file in filelist:
-            print(i)
+            print("Paper with the ID " + str(i)+ " is currently written to csv-file...")
             sent_list = sent_tokenize_file(file)
-            print(sent_list[0])
-            print(sent_list[1])
 
             j = 0
             f.write("Paper_ID;PreProcessed;Original")
