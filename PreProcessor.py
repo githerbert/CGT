@@ -7,8 +7,6 @@ from nltk.corpus import brown, stopwords
 import fnmatch
 from Contractions import CONTRACTIONS_DICT
 from Abbrevations import ABBREVATIONS_DICT
-from textblob import TextBlob, Word
-from textblob.taggers import NLTKTagger
 import time
 import spacy
 from paper import Paper
@@ -55,8 +53,6 @@ def convertEncoding(filename, encoding='utf-8'):
 # Extract codes from a file and store them in a list
 def read_codes(filename):
 
-    nltk_tagger = NLTKTagger()
-
     readfile = io.open(filename, encoding='utf16')
 
     cleared_code_list = []
@@ -100,7 +96,7 @@ def read_codes(filename):
              tag = item.tag_
              if tag != "VBG":
                  if tag == "NNS":
-                     word = Word(word).singularize()
+                     word = item.lemma_
                  if "VB" in tag:
                      word = item.lemma_
                  tagged_words.append(word)
@@ -200,7 +196,7 @@ def sent_tokenize_file(filename):
              word = item.text
              tag = item.tag_
              if tag == "NNS":
-                word = Word(word).singularize()
+                word = item.lemma_
              if "VB" in tag:
                 word = item.lemma_
              norm_word_list.append(word)
