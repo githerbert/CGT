@@ -88,7 +88,9 @@ def read_codes(filename):
          doc = nlp(cleared_code_list[i])
 
          for item in doc:
-             if "-" in item.text or u"\u2013" in item.text:
+             if item == doc[0] and "VB" in item.tag_:
+	     	pass
+             elif "-" in item.text or u"\u2013" in item.text:
 	     	dash_seperated_words = nlp(re.sub(r'([^a-zA-Z_]|_)+', ' ', item.text))
 		for dash_word in dash_seperated_words:
 			word = dash_word.text
