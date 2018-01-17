@@ -71,10 +71,6 @@ def read_codes(filename):
 
     for i in range(len(cleared_code_list)):
 
-         # Remove dashes
-         cleared_code_list[i] = cleared_code_list[i].replace("-", " ")
-
-
          # Remove text between brackets
          cleared_code_list[i] = re.sub("([\(\[]).*?([\)\]])", "\g<1>\g<2>", cleared_code_list[i])
 
@@ -92,14 +88,24 @@ def read_codes(filename):
          doc = nlp(cleared_code_list[i])
 
          for item in doc:
-             word = item.text
-             tag = item.tag_
-             if tag != "VBG":
-                 if tag == "NNS":
-                     word = item.lemma_
-                 if "VB" in tag:
-                     word = item.lemma_
-                 tagged_words.append(word)
+             if "-" in item.text or u"\u2013" in item.text:
+	     	dash_seperated_words = nlp(re.sub(r'([^a-zA-Z_]|_)+', ' ', item.text))
+		for dash_word in dash_seperated_words:
+			word = dash_word.text
+             		tag = dash_word.tag_
+             		if tag == "NNS":
+                		word = item.lemma_
+             		tagged_words.append(word)
+	     #else if not item.is_stop
+	     else:
+		# Splitt dash compounded words and singularize them 
+             	word = item.text
+             	tag = item.tag_
+             	if tag == "NNS":
+                	word = item.lemma_
+             	if "VB" in tag:
+                	word = item.lemma_
+             	tagged_words.append(word)
 
          for j in range(len(tagged_words)):
              #tagged_words[j] = remove_stopword(tagged_words[j])
@@ -179,10 +185,6 @@ def sent_tokenize_file(filename):
 
          sent_tokenize_list[i] = ' '.join(words)
 
-         # Replace dashes with whitespace
-         sent_tokenize_list[i] = sent_tokenize_list[i].replace("-", " ")
-         sent_tokenize_list[i] = sent_tokenize_list[i].replace(u"\u2013", " ")
-
          # Replace slashes with whitespace
          sent_tokenize_list[i] = sent_tokenize_list[i].replace("/", " ")
 
@@ -193,13 +195,25 @@ def sent_tokenize_file(filename):
          doc = nlp(sent_tokenize_list[i])
 
          for item in doc:
-             word = item.text
-             tag = item.tag_
-             if tag == "NNS":
-                word = item.lemma_
-             if "VB" in tag:
-                word = item.lemma_
-             norm_word_list.append(word)
+	     # Splitt dash compounded words and singularize them 
+             if "-" in item.text or u"\u2013" in item.text:
+	     	dash_seperated_words = nlp(re.sub(r'([^a-zA-Z_]|_)+', ' ', item.text))
+		for dash_word in dash_seperated_words:
+			word = dash_word.text
+             		tag = dash_word.tag_
+             		if tag == "NNS":
+                		word = item.lemma_
+             		norm_word_list.append(word)
+	     #else if not item.is_stop
+	     else:
+		# Splitt dash compounded words and singularize them 
+             	word = item.text
+             	tag = item.tag_
+             	if tag == "NNS":
+                	word = item.lemma_
+             	if "VB" in tag:
+                	word = item.lemma_
+             	norm_word_list.append(word)
 
          sent_tokenize_list[i] = ' '.join(norm_word_list)
 
@@ -225,7 +239,7 @@ def sent_tokenize_file(filename):
          if validWords == True and letters == True and len(words)>1:
              cleared_list.append(' '.join(words))
              original_list.append(sent_tokenize_list_copy[i])
-
+ 
     final_list = []
     final_list.append(original_list)
     final_list.append(cleared_list)
