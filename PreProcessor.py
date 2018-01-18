@@ -133,6 +133,9 @@ def sent_tokenize_file(filename):
     list = convertEncoding(filename)
     word_list = brown.words()
     word_set = set(word_list)
+    readfile = io.open(filename.replace("Main.txt", "Title.txt"), encoding="cp1252")
+    title = ' '.join([line for line in readfile])
+    title = title.replace(";", ",")
 
     fulltext = ""
 
@@ -245,6 +248,8 @@ def sent_tokenize_file(filename):
     final_list = []
     final_list.append(original_list)
     final_list.append(cleared_list)
+    final_list.append(title)
+    final_list.append(filename)
     print("--- %s seconds ---" % (time.time() - start_time))
     return final_list
 
@@ -301,7 +306,7 @@ def csvexport():
             f.write("Paper_ID;PreProcessed;Original")
             f.write('\n')
             for item in sent_list[0]:
-                f.write(str(i).encode('utf-8') + ';' + sent_list[0][j].encode('utf-8') + ';'+ sent_list[1][j].encode('utf-8-sig'))
+                f.write(str(i).encode('utf-8') + ';' + sent_list[0][j].encode('utf-8') + ';'+ sent_list[1][j].encode('utf-8-sig') + ';'+ sent_list[2].encode('utf-8-sig') + ';'+ sent_list[3].encode('utf-8-sig'))
                 f.write('\n')
                 j = j + 1
             
@@ -320,7 +325,7 @@ def csvimport():
     
     for row in data:
 	if int(row[0]) != flag:
-		paper = Paper(int(row[0]),[],[])
+		paper = Paper(int(row[0]),[],[],row[3], row[4])
 		preprocessed_paper_list.append(paper)
 		flag == row[0]
 	preprocessed_paper_list[int(row[0])].original_paper.append(row[1])
@@ -343,7 +348,7 @@ def paper_to_list():
         
         print(i)
         sent_list = sent_tokenize_file(file)
-        paper = Paper(i,sent_list[0],sent_list[1])
+        paper = Paper(i,sent_list[0],sent_list[1], sent_list[2], sent_list[3])
         preprocessed_paper_list.append(paper)
 	i += 1
 
