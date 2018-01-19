@@ -301,7 +301,7 @@ def csvexport():
          #   print(line)
     with open('./export/sentences.csv','w') as s:
         with open('./export/papers.csv', 'w') as p:
-            s.write("Paper_ID;PreProcessed;Original")
+            s.write("Paper_ID;Original;PreProcessed")
             s.write('\n')
             p.write("Paper_ID;Title;Path")
             p.write('\n')
