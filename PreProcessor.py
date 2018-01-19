@@ -3,7 +3,6 @@
 import os, io,re, nltk
 from nltk.tokenize import sent_tokenize
 from Definitions import ROOT_DIR, PAPER_DIR, CODES_PATH, OS_NAME
-from nltk.corpus import brown, stopwords
 import fnmatch
 from preprocessing_lib import CONTRACTIONS_DICT, ABBREVATIONS_DICT, DASHES_LIST
 import time
@@ -108,7 +107,6 @@ def read_codes(filename):
                     tagged_words.append(word)
 
         for j in range(len(tagged_words)):
-            #tagged_words[j] = remove_stopword(tagged_words[j])
             # Remove punctations
             tagged_words[j] = re.sub(r'([^a-zA-Z_]|_)+', '', tagged_words[j])
 
@@ -132,8 +130,6 @@ def read_codes(filename):
 def sent_tokenize_file(filename):
 
     list = convertEncoding(filename)
-    word_list = brown.words()
-    word_set = set(word_list)
     readfile = io.open(filename.replace("Main.txt", "Title.txt"), encoding="cp1252")
     title = ' '.join([line for line in readfile])
     title = title.replace(";", ",")
@@ -183,10 +179,9 @@ def sent_tokenize_file(filename):
 
              # Join dash-seperated words if valid words are seperated
              if len(words[j]) > 0 and words[j][-1] == ("-") and j+1 < len(words):
-                 if (re.sub(r'([^a-zA-Z_]|_)+', '', words[j]) + re.sub(r'([^a-zA-Z_]|_)+', '', words[j+1])) in word_set:
+                 if (re.sub(r'([^a-zA-Z_]|_)+', '', words[j]) + re.sub(r'([^a-zA-Z_]|_)+', '', words[j+1])) in nlp.vocab:
                      words[j] = words[j].replace("-", "") + words[j+1]
                      words[j+1] = ""
-
 
          sent_tokenize_list[i] = ' '.join(words)
 
@@ -226,7 +221,7 @@ def sent_tokenize_file(filename):
 
          for j in range(len(words)):
              # Remove Stop Words
-             #words[j] = remove_stopword(words[j])
+
              # Remove punctations and numbers
              words[j] = re.sub(r'([^a-zA-Z_]|_)+', '', words[j])
          sent_tokenize_list[i] = ' '.join(words)
@@ -236,7 +231,7 @@ def sent_tokenize_file(filename):
          letters = False
          for word in words:
              # Remove sententeces that contain no valid words
-             if word in word_set:
+             if word in nlp.vocab:
                  validWords = True
              # Remove sententeces that contain letters only
              if len(word) > 1:
@@ -265,13 +260,6 @@ def expand_abbrevations(s, abbrevations_dict=ABBREVATIONS_DICT):
         s = s.replace(key,abbrevations_dict[key])
     return s
 
-def remove_stopword(s):
-
-    if len(s) > 0 and (s[0].lower() + s[1:]) in stop_words:
-        s = ""
-
-    return s
-
 def normalize_dashes(s):
     for dash in DASHES_LIST:
         s = s.replace(dash,"-")
@@ -281,7 +269,6 @@ start_time = time.time()
 nlp = spacy.load('en', disable=['parser', 'ner', 'textcat'])
 print(nlp.pipeline)
 contractions_re = re.compile('(%s)' % '|'.join(CONTRACTIONS_DICT.keys()))
-stop_words = set(stopwords.words('english'))
 
 def code_to_list():
     codes = []
