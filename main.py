@@ -18,7 +18,11 @@ def main():
     score[3,0] = 4
     score[4,0] = 5
     print(np.percentile(score, 50, axis=0)[0])
-    PreProcessor.csvexport()
+    #PreProcessor.csvexport()
+    # for paper in PreProcessor.csvimport():
+    #     print("title: "+ paper.title)
+    #     print(paper.cleared_paper)
+
     
 
 if __name__ == "__main__":

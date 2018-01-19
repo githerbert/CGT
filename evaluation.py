@@ -10,19 +10,36 @@ from code import Code
 os.chdir(ROOT_DIR)
 
 papers = PreProcessor.csvimport()
+codes = PreProcessor.code_to_list()
 
 vocabulary = {}
 vocabulary = set()
 
+#Build vocabulary from codes und papers
+for code in codes:
+    vocabulary.update(code.cleared_code.split())
+
+numberOfSentences = 0
+
 for paper in papers:
+    numberOfSentences += len(paper.cleared_paper)
     for line in paper.cleared_paper:
         vocabulary.update(line.split())
 
 vocabulary = list(vocabulary)
 
-print(vocabulary)
+print("Codes " + str(len(codes)))
+print("sents " + str(numberOfSentences))
 
-infersentEncoder = InferSent(vocabulary=vocabulary)
+numberOfScores = len(codes) * numberOfSentences
+
+score = np.zeros(shape=(numberOfScores,4))
+
+print(score.shape)
+
+#print(vocabulary)
+# initialize InferSent Encoder with vocabulary
+#infersentEncoder = InferSent(vocabulary=vocabulary)
 #
 # sentences = []
 # sentences.append("Hello my name is")

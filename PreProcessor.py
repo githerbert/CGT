@@ -2,7 +2,7 @@
 # import modules & set up logging
 import os, io,re, nltk
 from nltk.tokenize import sent_tokenize
-from Definitions import ROOT_DIR, PAPER_DIR, CODES_PATH, OS_NAME
+from Definitions import ROOT_DIR, PAPER_DIR, CODES_PATH, OS_NAME, LEM
 import fnmatch
 from preprocessing_lib import CONTRACTIONS_DICT, ABBREVATIONS_DICT, DASHES_LIST
 import time
@@ -97,14 +97,14 @@ def read_codes(filename):
                             word = item.lemma_
                         tagged_words.append(word)
             #else if not item.is_stop
-	        else:
-                    word = item.text
-                    tag = item.tag_
-                    if tag == "NNS":
-                        word = item.lemma_
-                    if "VB" in tag:
-                        word = item.lemma_
-                    tagged_words.append(word)
+            else:
+                word = item.text
+                tag = item.tag_
+                if tag == "NNS":
+                    word = item.lemma_
+                if "VB" in tag and LEM == True:
+                    word = item.lemma_
+                tagged_words.append(word)
 
         for j in range(len(tagged_words)):
             # Remove punctations
@@ -206,12 +206,12 @@ def sent_tokenize_file(filename):
                     norm_word_list.append(word)
             #else if not item.is_stop
             else:
-            # Splitt dash compounded words and singularize them
+            # Split dash compounded words and singularize them
                 word = item.text
                 tag = item.tag_
                 if tag == "NNS":
                     word = item.lemma_
-                if "VB" in tag:
+                if "VB" in tag and LEM == True:
                     word = item.lemma_
                 norm_word_list.append(word)
 
@@ -275,7 +275,7 @@ def code_to_list():
     codelist = read_codes(CODES_PATH)
     for i in range(len(codelist[0])):
         code = Code(i,codelist[0][i],codelist[1][i])
-    codes.append(code)
+        codes.append(code)
     return codes
 
 def csvexport():
