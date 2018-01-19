@@ -70,58 +70,58 @@ def read_codes(filename):
 
     for i in range(len(cleared_code_list)):
 
-         # Remove text between brackets
-         cleared_code_list[i] = re.sub("([\(\[]).*?([\)\]])", "\g<1>\g<2>", cleared_code_list[i])
+        # Remove text between brackets
+        cleared_code_list[i] = re.sub("([\(\[]).*?([\)\]])", "\g<1>\g<2>", cleared_code_list[i])
 
-         # Expand contractions
-         cleared_code_list[i] = expand_contractions(cleared_code_list[i])
+        # Expand contractions
+        cleared_code_list[i] = expand_contractions(cleared_code_list[i])
 
-         # Expand abbrevations
-         cleared_code_list[i] = expand_abbrevations(cleared_code_list[i])
+        # Expand abbrevations
+        cleared_code_list[i] = expand_abbrevations(cleared_code_list[i])
 
-         # lowercasing
-         cleared_code_list[i] = cleared_code_list[i].lower()
+        # lowercasing
+        cleared_code_list[i] = cleared_code_list[i].lower()
 
-         tagged_words = []
+        tagged_words = []
 
-         doc = nlp(cleared_code_list[i])
+        doc = nlp(cleared_code_list[i])
 
-         for item in doc:
-             if item == doc[0] and "VB" in item.tag_:
-	     	pass
-             elif "-" in item.text or u"\u2013" in item.text:
-	     	dash_seperated_words = nlp(re.sub(r'([^a-zA-Z_]|_)+', ' ', item.text))
-		for dash_word in dash_seperated_words:
-			word = dash_word.text
-             		tag = dash_word.tag_
-             		if tag == "NNS":
-                		word = item.lemma_
-             		tagged_words.append(word)
-	     #else if not item.is_stop
-	     else:
-		# Splitt dash compounded words and singularize them 
-             	word = item.text
-             	tag = item.tag_
-             	if tag == "NNS":
-                	word = item.lemma_
-             	if "VB" in tag:
-                	word = item.lemma_
-             	tagged_words.append(word)
+        for item in doc:
+            if item == doc[0] and "VB" in item.tag_:
+                pass
+            # Splitt dash compounded words and singularize them
+            elif "-" in item.text or u"\u2013" in item.text:
+                dash_seperated_words = nlp(re.sub(r'([^a-zA-Z_]|_)+', ' ', item.text))
+                for dash_word in dash_seperated_words:
+                        word = dash_word.text
+                        tag = dash_word.tag_
+                        if tag == "NNS":
+                            word = item.lemma_
+                        tagged_words.append(word)
+            #else if not item.is_stop
+	        else:
+                    word = item.text
+                    tag = item.tag_
+                    if tag == "NNS":
+                        word = item.lemma_
+                    if "VB" in tag:
+                        word = item.lemma_
+                    tagged_words.append(word)
 
-         for j in range(len(tagged_words)):
-             #tagged_words[j] = remove_stopword(tagged_words[j])
-             # Remove punctations
-             tagged_words[j] = re.sub(r'([^a-zA-Z_]|_)+', '', tagged_words[j])
+        for j in range(len(tagged_words)):
+            #tagged_words[j] = remove_stopword(tagged_words[j])
+            # Remove punctations
+            tagged_words[j] = re.sub(r'([^a-zA-Z_]|_)+', '', tagged_words[j])
 
-         #Remove redundant whitespaces
-         cleared_code_list[i] = ' '.join(tagged_words)
+        #Remove redundant whitespaces
+        cleared_code_list[i] = ' '.join(tagged_words)
 
-         cleared_words = cleared_code_list[i].split()
+        cleared_words = cleared_code_list[i].split()
 
-         cleared_code_list[i] = ' '.join(cleared_words)
+        cleared_code_list[i] = ' '.join(cleared_words)
 
-         # Replace semicolon in original codes
-         original_codes[i] = original_codes[i].replace(";", ",")
+        # Replace semicolon in original codes
+        original_codes[i] = original_codes[i].replace(";", ",")
 
     final_codes = []
     final_codes.append(original_codes)
@@ -202,25 +202,25 @@ def sent_tokenize_file(filename):
          doc = nlp(sent_tokenize_list[i])
 
          for item in doc:
-	     # Splitt dash compounded words and singularize them 
-             if "-" in item.text or u"\u2013" in item.text:
-	     	dash_seperated_words = nlp(re.sub(r'([^a-zA-Z_]|_)+', ' ', item.text))
-		for dash_word in dash_seperated_words:
-			word = dash_word.text
-             		tag = dash_word.tag_
-             		if tag == "NNS":
-                		word = item.lemma_
-             		norm_word_list.append(word)
-	     #else if not item.is_stop
-	     else:
-		# Splitt dash compounded words and singularize them 
-             	word = item.text
-             	tag = item.tag_
-             	if tag == "NNS":
-                	word = item.lemma_
-             	if "VB" in tag:
-                	word = item.lemma_
-             	norm_word_list.append(word)
+         # Splitt dash compounded words and singularize them
+            if "-" in item.text or u"\u2013" in item.text:
+                dash_seperated_words = nlp(re.sub(r'([^a-zA-Z_]|_)+', ' ', item.text))
+                for dash_word in dash_seperated_words:
+                    word = dash_word.text
+                    tag = dash_word.tag_
+                    if tag == "NNS":
+                        word = item.lemma_
+                    norm_word_list.append(word)
+            #else if not item.is_stop
+            else:
+            # Splitt dash compounded words and singularize them
+                word = item.text
+                tag = item.tag_
+                if tag == "NNS":
+                    word = item.lemma_
+                if "VB" in tag:
+                    word = item.lemma_
+                norm_word_list.append(word)
 
          sent_tokenize_list[i] = ' '.join(norm_word_list)
 
@@ -281,12 +281,12 @@ contractions_re = re.compile('(%s)' % '|'.join(CONTRACTIONS_DICT.keys()))
 stop_words = set(stopwords.words('english'))
 
 def code_to_list():
-	codes = []
-	codelist = read_codes(CODES_PATH)
-	for i in range(len(codelist[0])):
-		code = Code(i,codelist[0][i],codelist[1][i])
-    		codes.append(code)
-	return codes
+    codes = []
+    codelist = read_codes(CODES_PATH)
+    for i in range(len(codelist[0])):
+        code = Code(i,codelist[0][i],codelist[1][i])
+    codes.append(code)
+    return codes
 
 def csvexport():
 
@@ -339,8 +339,8 @@ def csvimport():
 
     #Read sentences
     for row in sentences_data:
-	    preprocessed_paper_list[int(row[0])].original_paper.append(row[1])
-	    preprocessed_paper_list[int(row[0])].cleared_paper.append(row[2])
+        preprocessed_paper_list[int(row[0])].original_paper.append(row[1])
+        preprocessed_paper_list[int(row[0])].cleared_paper.append(row[2])
 
     return preprocessed_paper_list
 
@@ -361,7 +361,7 @@ def paper_to_list():
         sent_list = sent_tokenize_file(file)
         paper = Paper(i,sent_list[0],sent_list[1], sent_list[2], sent_list[3])
         preprocessed_paper_list.append(paper)
-	i += 1
+    i += 1
 
     return preprocessed_paper_list
 
