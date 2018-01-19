@@ -1,4 +1,5 @@
-
+# -*- coding: utf-8 -*-
+# import modules & set up logging
 CONTRACTIONS_DICT = {
 "ain't": "am not / are not / is not / has not / have not",
 "aren't": "are not / am not",
@@ -118,3 +119,26 @@ CONTRACTIONS_DICT = {
 "you're": "you are",
 "you've": "you have"
 }
+
+ABBREVATIONS_DICT = {
+"i.e.": "that is",
+"e.g.": "for example",
+"etc.": "and so forth",
+"viz.": "namely",
+"vs.": "against",
+"IT": "information technology"
+}
+
+DASHES_LIST = [
+u"\u2010",
+u"\u2011",
+u"\u2012",
+u"\u2013",
+u"\u2014",
+u"\u2015",
+u"\uFE58",
+u"\uFF0D",
+u"\u002D",
+u"\u058A",
+u"\u05BE"
+]

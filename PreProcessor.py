@@ -5,8 +5,7 @@ from nltk.tokenize import sent_tokenize
 from Definitions import ROOT_DIR, PAPER_DIR, CODES_PATH, OS_NAME
 from nltk.corpus import brown, stopwords
 import fnmatch
-from Contractions import CONTRACTIONS_DICT
-from Abbrevations import ABBREVATIONS_DICT
+from preprocessing_lib import CONTRACTIONS_DICT, ABBREVATIONS_DICT, DASHES_LIST
 import time
 import spacy
 from paper import Paper
@@ -90,7 +89,7 @@ def read_codes(filename):
             if item == doc[0] and "VB" in item.tag_:
                 pass
             # Splitt dash compounded words and singularize them
-            elif "-" in item.text or u"\u2013" in item.text:
+            elif "-" in item.text:
                 dash_seperated_words = nlp(re.sub(r'([^a-zA-Z_]|_)+', ' ', item.text))
                 for dash_word in dash_seperated_words:
                         word = dash_word.text
@@ -158,6 +157,9 @@ def sent_tokenize_file(filename):
 
     # Remove et al. from corpus
     fulltext = fulltext.replace(" et al.", "")
+    # Normalize Dashes
+    fulltext = normalize_dashes(fulltext)
+
     # Expand abbrevations
     fulltext = expand_abbrevations(fulltext)
     # Tokenize sentences
@@ -184,10 +186,6 @@ def sent_tokenize_file(filename):
                  if (re.sub(r'([^a-zA-Z_]|_)+', '', words[j]) + re.sub(r'([^a-zA-Z_]|_)+', '', words[j+1])) in word_set:
                      words[j] = words[j].replace("-", "") + words[j+1]
                      words[j+1] = ""
-             if len(words[j]) > 0 and words[j][-1] == (u"\u2013") in words[j] and j+1 < len(words):
-                 if (re.sub(r'([^a-zA-Z_]|_)+', '', words[j]) + re.sub(r'([^a-zA-Z_]|_)+', '', words[j + 1])) in word_set:
-                    words[j] = words[j].replace(u"\u2013", "") + words[j+1]
-                    words[j+1] = ""
 
 
          sent_tokenize_list[i] = ' '.join(words)
@@ -202,8 +200,8 @@ def sent_tokenize_file(filename):
          doc = nlp(sent_tokenize_list[i])
 
          for item in doc:
-         # Splitt dash compounded words and singularize them
-            if "-" in item.text or u"\u2013" in item.text:
+         # Split dash compounded words and singularize them
+            if "-" in item.text:
                 dash_seperated_words = nlp(re.sub(r'([^a-zA-Z_]|_)+', ' ', item.text))
                 for dash_word in dash_seperated_words:
                     word = dash_word.text
@@ -272,6 +270,11 @@ def remove_stopword(s):
     if len(s) > 0 and (s[0].lower() + s[1:]) in stop_words:
         s = ""
 
+    return s
+
+def normalize_dashes(s):
+    for dash in DASHES_LIST:
+        s = s.replace(dash,"-")
     return s
 
 start_time = time.time()
