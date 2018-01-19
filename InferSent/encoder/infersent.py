@@ -9,7 +9,7 @@ from Definitions import ROOT_DIR
 
 class InferSent:
 
-    def __init__(self):
+    def __init__(self, vocabulary=[]):
         self.GLOVE_PATH = ROOT_DIR + '/InferSent/dataset/GloVe/glove.840B.300d.txt'
 
         # LOAD MODEL
@@ -29,7 +29,10 @@ class InferSent:
 
         self.model.set_glove_path(self.GLOVE_PATH)
 
-        self.model.build_vocab_k_words(K=200000)
+        if len(vocabulary) > 0:
+            self.model.build_vocab(vocabulary, tokenize=True)
+        else:
+            self.model.build_vocab_k_words(K=200000)
 
     #print(cosine(model.encode(['the cat eats.'])[0], model.encode(['the cat drinks.'])[0]))
     # print("The cosine similarity between the two sentences")
@@ -43,6 +46,8 @@ class InferSent:
     def get_sent_embeddings(self, sentences):
         return self.model.encode(sentences)
 
+    def cosine(self, u, v):
+        return np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))
 
-def cosine(u, v):
-    return np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))
+
+
