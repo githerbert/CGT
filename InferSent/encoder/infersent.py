@@ -7,7 +7,7 @@ import numpy as np
 import torch, os
 from Definitions import ROOT_DIR
 
-class InterSent:
+class InferSent:
 
     def __init__(self):
         self.GLOVE_PATH = ROOT_DIR + '/InferSent/dataset/GloVe/glove.840B.300d.txt'
@@ -18,8 +18,6 @@ class InterSent:
         # model = torch.load('infersent.allnli.pickle')
 
         os.chdir(os.path.dirname(__file__))
-
-        print(os.path.dirname(__file__))
 
         self.model = torch.load('infersent.allnli.pickle', map_location=lambda storage, loc: storage)
 
