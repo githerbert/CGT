@@ -121,6 +121,9 @@ def read_codes(filename):
 
          cleared_code_list[i] = ' '.join(cleared_words)
 
+         # Replace semicolon in original codes
+         original_codes[i] = original_codes[i].replace(";", ",")
+
     final_codes = []
     final_codes.append(original_codes)
     final_codes.append(cleared_code_list)
@@ -243,7 +246,7 @@ def sent_tokenize_file(filename):
                  letters = True
          if validWords == True and letters == True and len(words)>1:
              cleared_list.append(' '.join(words))
-             original_list.append(sent_tokenize_list_copy[i])
+             original_list.append(sent_tokenize_list_copy[i].replace(";", ","))
  
     final_list = []
     final_list.append(original_list)
@@ -296,40 +299,49 @@ def csvexport():
     i = 0
         #for line in sent_list[0]:
          #   print(line)
-    with open('paper_export.csv','w') as f:
-        # iterate through all main texts and print their sentences
-        for file in filelist:
-            print("Paper with the ID " + str(i)+ " is currently written to csv-file...")
-            sent_list = sent_tokenize_file(file)
+    with open('./export/sentences.csv','w') as s:
+        with open('./export/papers.csv', 'w') as p:
+            s.write("Paper_ID;PreProcessed;Original")
+            s.write('\n')
+            p.write("Paper_ID;Title;Path")
+            p.write('\n')
+            # iterate through all main texts and print their sentences
+            for file in filelist:
+                print("Paper with the ID " + str(i)+ " is currently written to csv-file...")
+                sent_list = sent_tokenize_file(file)
+                p.write(str(i).encode('utf-8') + ';'+ sent_list[2].encode('utf-8-sig') + ';'+ sent_list[3].encode('utf-8-sig'))
+                p.write('\n')
 
-            j = 0
-            f.write("Paper_ID;PreProcessed;Original")
-            f.write('\n')
-            for item in sent_list[0]:
-                f.write(str(i).encode('utf-8') + ';' + sent_list[0][j].encode('utf-8') + ';'+ sent_list[1][j].encode('utf-8-sig') + ';'+ sent_list[2].encode('utf-8-sig') + ';'+ sent_list[3].encode('utf-8-sig'))
-                f.write('\n')
-                j = j + 1
-            
-            i += 1
+                j = 0
+
+                for item in sent_list[0]:
+                    s.write(str(i).encode('utf-8') + ';' + sent_list[0][j].encode('utf-8') + ';'+ sent_list[1][j].encode('utf-8-sig'))
+                    s.write('\n')
+                    j = j + 1
+
+                i += 1
 
 def csvimport():
 
     preprocessed_paper_list = []
 
-    myfile = open('paper_export.csv')
-    data = unicodecsv.reader(myfile, encoding='utf-8', delimiter=';')
-    data.next()
-    
-    # Create a paper every time a line with new paper_id is red
-    flag = -1
-    
-    for row in data:
-	if int(row[0]) != flag:
-		paper = Paper(int(row[0]),[],[],row[3], row[4])
-		preprocessed_paper_list.append(paper)
-		flag == row[0]
-	preprocessed_paper_list[int(row[0])].original_paper.append(row[1])
-	preprocessed_paper_list[int(row[0])].cleared_paper.append(row[2])
+    myfile = open('./export/sentences.csv')
+    sentences_data = unicodecsv.reader(myfile, encoding='utf-8', delimiter=';')
+    sentences_data.next()
+
+    papers = open('./export/papers.csv')
+    papers_data = unicodecsv.reader(papers, encoding='utf-8', delimiter=';')
+    papers_data.next()
+
+    #Read Papers
+    for row in papers_data:
+        paper = Paper(int(row[0]), [], [], row[1], row[2])
+        preprocessed_paper_list.append(paper)
+
+    #Read sentences
+    for row in sentences_data:
+	    preprocessed_paper_list[int(row[0])].original_paper.append(row[1])
+	    preprocessed_paper_list[int(row[0])].cleared_paper.append(row[2])
 
     return preprocessed_paper_list
 
