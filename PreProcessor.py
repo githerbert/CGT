@@ -11,7 +11,6 @@ import time
 import spacy
 from paper import Paper
 from code import Code
-from score import Score
 import unicodecsv
 
 # iterate through all subdirectories recusively and store all Main texts to a list
