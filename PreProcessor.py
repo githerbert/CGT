@@ -309,13 +309,13 @@ def csvexport():
             for file in filelist:
                 print("Paper with the ID " + str(i)+ " is currently written to csv-file...")
                 sent_list = sent_tokenize_file(file)
-                p.write(str(i).encode('utf-8') + ';'+ sent_list[2].encode('utf-8-sig') + ';'+ sent_list[3].encode('utf-8-sig'))
+                p.write(str(i).encode('utf-8-sig') + ';'+ sent_list[2].encode('utf-8-sig') + ';'+ sent_list[3].encode('utf-8-sig'))
                 p.write('\n')
 
                 j = 0
 
                 for item in sent_list[0]:
-                    s.write(str(i).encode('utf-8') + ';' + sent_list[0][j].encode('utf-8') + ';'+ sent_list[1][j].encode('utf-8-sig'))
+                    s.write(str(i).encode('utf-8-sig') + ';' + sent_list[0][j].encode('utf-8-sig') + ';'+ sent_list[1][j].encode('utf-8-sig'))
                     s.write('\n')
                     j = j + 1
 
@@ -326,11 +326,11 @@ def csvimport():
     preprocessed_paper_list = []
 
     myfile = open('./export/sentences.csv')
-    sentences_data = unicodecsv.reader(myfile, encoding='utf-8', delimiter=';')
+    sentences_data = unicodecsv.reader(myfile, encoding='utf-8-sig', delimiter=';')
     sentences_data.next()
 
     papers = open('./export/papers.csv')
-    papers_data = unicodecsv.reader(papers, encoding='utf-8', delimiter=';')
+    papers_data = unicodecsv.reader(papers, encoding='utf-8-sig', delimiter=';')
     papers_data.next()
 
     #Read Papers
