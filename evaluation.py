@@ -60,12 +60,15 @@ def get_infersent_score():
                 score[index, 2] = code.id
                 score[index, 3] = infersentEncoder.cosine(code.embedding,paper_embeddings[sentence_id])
                 print(paper.cleared_paper[int(score[index,1])] + " // " + codes[int(score[index,2])].cleared_code + " //// " + str(score[index, 3]))
-                index += index
+                print(score[index,:])
+                index += 1
 
     print(infersentEncoder.cosine(infersentEncoder.model.encode(['our finding suggest that the analysis of mouse cursor movement may enable researcher to assess negative emotional reaction during live system use examine emotional reaction with more temporal precision conduct multimethod emotion research and provide researcher and system designer with an easy to deploy but powerful tool to infer user negative emotion to create more unobtrusive affective and adaptive system'])[0], infersentEncoder.model.encode(['the value of automatically analyze external datum'])[0]))
 
+    print(score)
+
     os.chdir(ROOT_DIR)
-    np.savetxt("score.csv", score, delimiter=";")
+    np.savetxt("score.csv", score, delimiter=";", fmt='%1.3f')
     #csv = np.genfromtxt('score.csv', delimiter=";")
 
 def get_sent2vec_score():
@@ -90,7 +93,7 @@ def get_sent2vec_score():
                 score[index, 2] = code.id
                 score[index, 3] = sent2vec.sent2vec_encoder.cosine(code.embedding, paper_embeddings[sentence_id])
                 print(paper.cleared_paper[int(score[index, 1])] + " // " + codes[int(score[index, 2])].cleared_code + " //// " + str(score[index, 3]))
-                index += index
+                index += 1
 
     sents = []
     sents.append('our finding suggest that the analysis of mouse cursor movement may enable researcher to assess negative emotional reaction during live system use examine emotional reaction with more temporal precision conduct multimethod emotion research and provide researcher and system designer with an easy to deploy but powerful tool to infer user negative emotion to create more unobtrusive affective and adaptive system')
@@ -98,7 +101,8 @@ def get_sent2vec_score():
     embeddings = sent2vec.sent2vec_encoder.get_sentence_embeddings(sents, ngram='unigrams', model='toronto')
     print(sent2vec.sent2vec_encoder.cosine(embeddings[0],embeddings[1]))
 
-get_sent2vec_score()
+#get_sent2vec_score()
+get_infersent_score()
 
 #print(vocabulary)
 # initialize InferSent Encoder with vocabulary
