@@ -2,7 +2,7 @@
 # import modules & set up logging
 import os, io,re, nltk
 from nltk.tokenize import sent_tokenize
-from Definitions import ROOT_DIR, PAPER_DIR, CODES_PATH, OS_NAME, LEM
+from Definitions import ROOT_DIR, PAPER_DIR, CODES_PATH, OS_NAME, LEM, STOP
 import fnmatch
 from preprocessing_lib import CONTRACTIONS_DICT, ABBREVATIONS_DICT, DASHES_LIST
 import time
@@ -85,7 +85,7 @@ def read_codes(filename):
         doc = nlp(cleared_code_list[i])
 
         for item in doc:
-            if item == doc[0] and "VB" in item.tag_:
+            if (item == doc[0] and "VB" in item.tag_) or (STOP == True and item.is_stop == True):
                 pass
             # Splitt dash compounded words and singularize them
             elif "-" in item.text:
@@ -195,8 +195,10 @@ def sent_tokenize_file(filename):
          doc = nlp(sent_tokenize_list[i])
 
          for item in doc:
-         # Split dash compounded words and singularize them
-            if "-" in item.text:
+            if STOP == True and item.is_stop == True:
+                pass
+            # Split dash compounded words and singularize them
+            elif "-" in item.text:
                 dash_seperated_words = nlp(re.sub(r'([^a-zA-Z_]|_)+', ' ', item.text))
                 for dash_word in dash_seperated_words:
                     word = dash_word.text

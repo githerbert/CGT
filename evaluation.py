@@ -37,6 +37,29 @@ score = np.zeros(shape=(numberOfScores,4))
 
 print(score.shape)
 
+infersentEncoder = InferSent(vocabulary=vocabulary)
+
+# Get code embeddings
+for code in codes:
+    code.embedding = infersentEncoder.get_sent_embeddings([code.cleared_code])
+
+index = 0
+
+for paper in papers:
+    print("Encoding paper id " + str(paper.id))
+    paper_embeddings = infersentEncoder.get_sent_embeddings(paper.cleared_paper)
+    for sentence_id in range(len(paper.cleared_paper)):
+        for code in codes:
+            score[index, 0] = paper.id
+            score[index, 1] = sentence_id
+            score[index, 2] = code.id
+            score[index, 3] = infersentEncoder.cosine(code.embedding,paper_embeddings[sentence_id])
+            index += index
+
+np.savetxt("score.csv", score, delimiter=";")
+#csv = np.genfromtxt('score.csv', delimiter=";")
+
+
 #print(vocabulary)
 # initialize InferSent Encoder with vocabulary
 #infersentEncoder = InferSent(vocabulary=vocabulary)

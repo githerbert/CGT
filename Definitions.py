@@ -10,3 +10,5 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Activate lemmatization
 LEM = True
+# Activate stopword removal
+STOP = False
