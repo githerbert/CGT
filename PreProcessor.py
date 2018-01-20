@@ -284,6 +284,7 @@ def csvexport():
 
     #store paths of all main-texts in the given directory to a list
     filelist = iterate_folder(PAPER_DIR)
+    numberOfPapers = len(filelist)
 
 
     # number of the paper
@@ -298,7 +299,7 @@ def csvexport():
             p.write('\n')
             # iterate through all main texts and print their sentences
             for file in filelist:
-                print("Paper with the ID " + str(i)+ " is currently written to csv-file...")
+                print("Paper with the ID " + str(i)+ " is currently written to csv-file... " + str(i)+ " / " + str(numberOfPapers))
                 sent_list = sent_tokenize_file(file)
                 p.write(str(i).encode('utf-8-sig') + ';'+ sent_list[2].encode('utf-8-sig') + ';'+ sent_list[3].encode('utf-8-sig'))
                 p.write('\n')
