@@ -5,7 +5,7 @@ from random import randint
 
 import numpy as np
 import torch, os
-from Definitions import ROOT_DIR
+from Definitions import ROOT_DIR, CUDA
 
 class InferSent:
 
@@ -19,9 +19,11 @@ class InferSent:
 
         os.chdir(os.path.dirname(__file__))
 
-        self.model = torch.load('infersent.allnli.pickle', map_location=lambda storage, loc: storage)
-
-        torch.set_num_threads(2)
+        if(CUDA==True):
+            self.model = torch.load('infersent.allnli.pickle')
+        else:
+            self.model = torch.load('infersent.allnli.pickle', map_location=lambda storage, loc: storage)
+            torch.set_num_threads(2)
 
         # torch.load(..pickle) will use GPU/Cuda by default. If you are on CPU:
         # model = torch.load('infersent.allnli.pickle', map_location=lambda storage, loc: storage)
