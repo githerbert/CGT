@@ -6,6 +6,7 @@ from Definitions import ROOT_DIR
 import os, PreProcessor
 from InferSent.encoder.infersent import InferSent
 from code import Code
+import sent2vec.sent2vec_encoder
 
 os.chdir(ROOT_DIR)
 
@@ -37,28 +38,67 @@ score = np.zeros(shape=(numberOfScores,4))
 
 print(score.shape)
 
-infersentEncoder = InferSent(vocabulary=vocabulary)
+#infersentEncoder = InferSent(vocabulary=vocabulary)
 
-# Get code embeddings
-for code in codes:
-    code.embedding = infersentEncoder.get_sent_embeddings([code.cleared_code])
 
-index = 0
+def get_infersent_score():
+    infersentEncoder = InferSent()
 
-for paper in papers:
-    print("Encoding paper id " + str(paper.id))
-    paper_embeddings = infersentEncoder.get_sent_embeddings(paper.cleared_paper)
-    for sentence_id in range(len(paper.cleared_paper)):
-        for code in codes:
-            score[index, 0] = paper.id
-            score[index, 1] = sentence_id
-            score[index, 2] = code.id
-            score[index, 3] = infersentEncoder.cosine(code.embedding,paper_embeddings[sentence_id])
-            index += index
+    # Get code embeddings
+    for code in codes:
+        code.embedding = infersentEncoder.get_sent_embeddings([code.cleared_code])
 
-np.savetxt("score.csv", score, delimiter=";")
-#csv = np.genfromtxt('score.csv', delimiter=";")
+    index = 0
 
+    for paper in papers:
+        print("Encoding paper id " + str(paper.id))
+        paper_embeddings = infersentEncoder.get_sent_embeddings(paper.cleared_paper)
+        for sentence_id in range(len(paper.cleared_paper)):
+            for code in codes:
+                score[index, 0] = paper.id
+                score[index, 1] = sentence_id
+                score[index, 2] = code.id
+                score[index, 3] = infersentEncoder.cosine(code.embedding,paper_embeddings[sentence_id])
+                print(paper.cleared_paper[int(score[index,1])] + " // " + codes[int(score[index,2])].cleared_code + " //// " + str(score[index, 3]))
+                index += index
+
+    print(infersentEncoder.cosine(infersentEncoder.model.encode(['our finding suggest that the analysis of mouse cursor movement may enable researcher to assess negative emotional reaction during live system use examine emotional reaction with more temporal precision conduct multimethod emotion research and provide researcher and system designer with an easy to deploy but powerful tool to infer user negative emotion to create more unobtrusive affective and adaptive system'])[0], infersentEncoder.model.encode(['the value of automatically analyze external datum'])[0]))
+
+    os.chdir(ROOT_DIR)
+    np.savetxt("score.csv", score, delimiter=";")
+    #csv = np.genfromtxt('score.csv', delimiter=";")
+
+def get_sent2vec_score():
+
+    # Get code embeddings
+    codelist = []
+    for code in codes:
+        codelist.append(code.cleared_code)
+    code_embeddings = sent2vec.sent2vec_encoder.get_sentence_embeddings(codelist, ngram='unigrams', model='toronto')
+    for i in range(len(codes)):
+        codes[i].embedding = code_embeddings[i]
+
+    index = 0
+
+    for paper in papers:
+        print("Encoding paper id " + str(paper.id))
+        paper_embeddings = sent2vec.sent2vec_encoder.get_sentence_embeddings(paper.cleared_paper, ngram='unigrams', model='toronto')
+        for sentence_id in range(len(paper.cleared_paper)):
+            for code in codes:
+                score[index, 0] = paper.id
+                score[index, 1] = sentence_id
+                score[index, 2] = code.id
+                score[index, 3] = sent2vec.sent2vec_encoder.cosine(code.embedding, paper_embeddings[sentence_id])
+                print(paper.cleared_paper[int(score[index, 1])] + " // " + codes[int(score[index, 2])].cleared_code + " //// " + str(score[index, 3]))
+                index += index
+
+    sents = []
+    sents.append('our finding suggest that the analysis of mouse cursor movement may enable researcher to assess negative emotional reaction during live system use examine emotional reaction with more temporal precision conduct multimethod emotion research and provide researcher and system designer with an easy to deploy but powerful tool to infer user negative emotion to create more unobtrusive affective and adaptive system')
+    sents.append('the value of automatically analyze external datum')
+    embeddings = sent2vec.sent2vec_encoder.get_sentence_embeddings(sents, ngram='unigrams', model='toronto')
+    print(sent2vec.sent2vec_encoder.cosine(embeddings[0],embeddings[1]))
+
+get_sent2vec_score()
 
 #print(vocabulary)
 # initialize InferSent Encoder with vocabulary

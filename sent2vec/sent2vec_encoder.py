@@ -9,11 +9,12 @@ from subprocess import call
 import numpy as np
 from nltk import TweetTokenizer
 from nltk.tokenize.stanford import StanfordTokenizer
+from Definitions import ROOT_DIR
 
 
 FASTTEXT_EXEC_PATH = os.path.abspath("./fasttext")
 
-BASE_SNLP_PATH = "/home/simon/Downloads/sent2vec-master/"
+BASE_SNLP_PATH = ROOT_DIR + "/sent2vec/"
 SNLP_TAGGER_JAR = os.path.join(BASE_SNLP_PATH, "stanford-postagger.jar")
 
 MODEL_WIKI_UNIGRAMS = os.path.abspath("./sent2vec_wiki_unigrams")
@@ -170,14 +171,13 @@ def get_sentence_embeddings(sentences, ngram='bigrams', model='concat_wiki_twitt
         return toronto_embeddings
     sys.exit(-1)
 
-sentences = ['fast computer', 'fast information system']
+#sentences = ['fast computer', 'fast information system']
 
-my_embeddings = get_sentence_embeddings(sentences, ngram='unigrams', model='toronto')
+#my_embeddings = get_sentence_embeddings(sentences, ngram='unigrams', model='toronto')
 #my_embeddings = get_embeddings_for_preprocessed_sentences(sentences,"/media/sf_Shared/torontobooks_unigrams.bin",FASTTEXT_EXEC_PATH)
-print(my_embeddings.shape)
+#print(my_embeddings.shape)
 
-result = 1 - spatial.distance.cosine(my_embeddings[0], my_embeddings[1])
-print("The cosine similarity between the two sentences")
-print(sentences)
-print("is:")
-print(result)
+#result = 1 - spatial.distance.cosine(my_embeddings[0], my_embeddings[1])
+
+def cosine(u,v):
+    return 1 - spatial.distance.cosine(u, v)
