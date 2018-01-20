@@ -318,11 +318,11 @@ def csvimport():
     preprocessed_paper_list = []
 
     myfile = open('./export/sentences.csv')
-    sentences_data = unicodecsv.reader(myfile, encoding='utf-8-sig', delimiter=';')
+    sentences_data = unicodecsv.reader((x.replace('\0', '') for x in myfile), encoding='utf-8-sig', delimiter=';')
     sentences_data.next()
 
     papers = open('./export/papers.csv')
-    papers_data = unicodecsv.reader(papers, encoding='utf-8-sig', delimiter=';')
+    papers_data = unicodecsv.reader((x.replace('\0', '') for x in papers), encoding='utf-8-sig', delimiter=';')
     papers_data.next()
 
     #Read Papers
