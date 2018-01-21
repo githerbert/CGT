@@ -12,14 +12,14 @@ from nltk.tokenize.stanford import StanfordTokenizer
 from Definitions import ROOT_DIR
 
 
-FASTTEXT_EXEC_PATH = os.path.abspath("./fasttext")
+FASTTEXT_EXEC_PATH = os.path.abspath("./sent2vec/fasttext")
 
 BASE_SNLP_PATH = ROOT_DIR + "/sent2vec/"
 SNLP_TAGGER_JAR = os.path.join(BASE_SNLP_PATH, "stanford-postagger.jar")
 
 MODEL_WIKI_UNIGRAMS = os.path.abspath("./sent2vec_wiki_unigrams")
 MODEL_WIKI_BIGRAMS = os.path.abspath("./sent2vec_wiki_bigrams")
-MODEL_TORONTOBOOKS_UNIGRAMS = "/media/sf_Shared/torontobooks_unigrams.bin"
+MODEL_TORONTOBOOKS_UNIGRAMS = "/media/ubuntu/San480/VMs/Shared/torontobooks_unigrams.bin"
 MODEL_TORONTOBOOKS_BIGRAMS = os.path.abspath("./sent2vec_wiki_bigrams")
 MODEL_TWITTER_UNIGRAMS = os.path.abspath('./sent2vec_twitter_unigrams')
 MODEL_TWITTER_BIGRAMS = os.path.abspath('./sent2vec_twitter_bigrams')
@@ -114,6 +114,10 @@ def dump_text_to_disk(file_path, X, Y=None):
             for x in X:
                 out_stream.write(x+' \n')
 
+def encode(sentences):
+    return get_embeddings_for_preprocessed_sentences(sentences, \
+                                     MODEL_TORONTOBOOKS_UNIGRAMS, FASTTEXT_EXEC_PATH)
+
 def get_sentence_embeddings(sentences, ngram='bigrams', model='concat_wiki_twitter'):
     """ Returns a numpy matrix of embeddings for one of the published models. It
     handles tokenization and can be given raw sentences.
@@ -171,9 +175,9 @@ def get_sentence_embeddings(sentences, ngram='bigrams', model='concat_wiki_twitt
         return toronto_embeddings
     sys.exit(-1)
 
-#sentences = ['fast computer', 'fast information system']
+sentences = ['fast computer', 'fast information system']
 
-#my_embeddings = get_sentence_embeddings(sentences, ngram='unigrams', model='toronto')
+my_embeddings = get_sentence_embeddings(sentences, ngram='unigrams', model='toronto')
 #my_embeddings = get_embeddings_for_preprocessed_sentences(sentences,"/media/sf_Shared/torontobooks_unigrams.bin",FASTTEXT_EXEC_PATH)
 #print(my_embeddings.shape)
 

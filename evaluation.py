@@ -69,6 +69,7 @@ def get_infersent_score():
                 score[index, 2] = code.id
                 score[index, 3] = infersentEncoder.cosine(code.embedding,paper_embeddings[sentence_id])
                 index += 1
+
         print("--- %s seconds ---" % (time.time() - start_time))
 
     os.chdir(ROOT_DIR)
@@ -81,30 +82,39 @@ def get_sent2vec_score():
     codelist = []
     for code in codes:
         codelist.append(code.cleared_code)
-    code_embeddings = sent2vec.sent2vec_encoder.get_sentence_embeddings(codelist, ngram='unigrams', model='toronto')
+    #code_embeddings = sent2vec.sent2vec_encoder.get_sentence_embeddings(codelist, ngram='unigrams', model='toronto')
+    code_embeddings = sent2vec.sent2vec_encoder.encode(codelist)
     for i in range(len(codes)):
         codes[i].embedding = code_embeddings[i]
 
     index = 0
 
+    start_time = time.time()
+
     for paper in papers:
         print("Encoding paper id " + str(paper.id))
-        paper_embeddings = sent2vec.sent2vec_encoder.get_sentence_embeddings(paper.cleared_paper, ngram='unigrams', model='toronto')
+        #paper_embeddings = sent2vec.sent2vec_encoder.get_sentence_embeddings(paper.cleared_paper, ngram='unigrams', model='toronto')
+        paper_embeddings = sent2vec.sent2vec_encoder.encode(paper.cleared_paper)
         for sentence_id in range(len(paper.cleared_paper)):
             for code in codes:
                 score[index, 0] = paper.id
                 score[index, 1] = sentence_id
                 score[index, 2] = code.id
                 score[index, 3] = sent2vec.sent2vec_encoder.cosine(code.embedding, paper_embeddings[sentence_id])
-                print(paper.cleared_paper[int(score[index, 1])] + " // " + codes[int(score[index, 2])].cleared_code + " //// " + str(score[index, 3]))
+                #print(paper.cleared_paper[int(score[index, 1])] + " // " + codes[int(score[index, 2])].cleared_code + " //// " + str(score[index, 3]))
                 index += 1
+        print("--- %s seconds ---" % (time.time() - start_time))
 
-    sents = []
-    sents.append('our finding suggest that the analysis of mouse cursor movement may enable researcher to assess negative emotional reaction during live system use examine emotional reaction with more temporal precision conduct multimethod emotion research and provide researcher and system designer with an easy to deploy but powerful tool to infer user negative emotion to create more unobtrusive affective and adaptive system')
-    sents.append('the value of automatically analyze external datum')
-    embeddings = sent2vec.sent2vec_encoder.get_sentence_embeddings(sents, ngram='unigrams', model='toronto')
-    print(sent2vec.sent2vec_encoder.cosine(embeddings[0],embeddings[1]))
 
-#get_sent2vec_score()
-get_infersent_score()
+    #sents = []
+    #sents.append('our finding suggest that the analysis of mouse cursor movement may enable researcher to assess negative emotional reaction during live system use examine emotional reaction with more temporal precision conduct multimethod emotion research and provide researcher and system designer with an easy to deploy but powerful tool to infer user negative emotion to create more unobtrusive affective and adaptive system')
+    #sents.append('the value of automatically analyze external datum')
+    #embeddings = sent2vec.sent2vec_encoder.get_sentence_embeddings(sents, ngram='unigrams', model='toronto')
+    #print(sent2vec.sent2vec_encoder.cosine(embeddings[0],embeddings[1]))
+
+    os.chdir(ROOT_DIR)
+    np.savetxt("score.csv", score, delimiter=";", fmt='%1.3f')
+
+get_sent2vec_score()
+#get_infersent_score()
 
