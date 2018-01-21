@@ -73,8 +73,9 @@ def get_infersent_score():
         print("--- %s seconds ---" % (time.time() - start_time))
 
     os.chdir(ROOT_DIR)
-    np.savetxt("score.csv", score, delimiter=";", fmt='%1.3f')
+    #np.savetxt("score.csv", score, delimiter=";", fmt='%1.3f')
     #csv = np.genfromtxt('score.csv', delimiter=";")
+    np.save('infersent_score.npy', score)
 
 def get_sent2vec_score():
 
@@ -113,8 +114,9 @@ def get_sent2vec_score():
     #print(sent2vec.sent2vec_encoder.cosine(embeddings[0],embeddings[1]))
 
     os.chdir(ROOT_DIR)
-    np.savetxt("score.csv", score, delimiter=";", fmt='%1.3f')
+    #np.savetxt("score.csv", score, delimiter=";", fmt='%1.3f')
+    np.save('sent2vec_score.npy', score)
 
-get_sent2vec_score()
+#get_sent2vec_score()
 #get_infersent_score()
 

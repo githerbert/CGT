@@ -175,9 +175,9 @@ def get_sentence_embeddings(sentences, ngram='bigrams', model='concat_wiki_twitt
         return toronto_embeddings
     sys.exit(-1)
 
-sentences = ['fast computer', 'fast information system']
+#sentences = ['fast computer', 'fast information system']
 
-my_embeddings = get_sentence_embeddings(sentences, ngram='unigrams', model='toronto')
+#my_embeddings = get_sentence_embeddings(sentences, ngram='unigrams', model='toronto')
 #my_embeddings = get_embeddings_for_preprocessed_sentences(sentences,"/media/sf_Shared/torontobooks_unigrams.bin",FASTTEXT_EXEC_PATH)
 #print(my_embeddings.shape)
 
