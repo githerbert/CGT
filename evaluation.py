@@ -2,12 +2,13 @@
 # import modules & set up logging
 import PreProcessor
 import numpy as np
-from Definitions import ROOT_DIR
+from Definitions import ROOT_DIR, LEM, STOP
 import os, PreProcessor
 from InferSent.encoder.infersent import InferSent
 from code import Code
 import sent2vec.sent2vec_encoder
 import time
+import spacy
 
 os.chdir(ROOT_DIR)
 
@@ -227,17 +228,15 @@ def get_sent2vec_evaluation_samples():
     # 0.22 - 0.86 = 0,64
 
     i = 0.22
+    count = 0
+    sample_size = 7
     #
     while i < 0.86:
-    #     # take 8 samples. Last 12 steps only take 7 samples
+    #     # take 8 samples. First 12 steps only take 7 samples
         result = np.argwhere((score_column >= i) & (score_column < (i + 0.01))).flatten()
 
-        sample_size = 8
-
-        if True:
+        if count == 12:
             sample_size = 8
-        else:
-            sample_size = 7
 
         random_sample = np.random.choice(result,sample_size,replace=False)
 
@@ -247,8 +246,115 @@ def get_sent2vec_evaluation_samples():
             sample_array = np.vstack((sample_array, score[index, :]))
 
         i += 0.01
+        count += 1
 
-get_infersent_evaluation_samples()
+    return sample_array
+
+def join_sample_arrays(infersent_sample, sent2vec_sample):
+
+    joined_array = np.vstack((infersent_sample, sent2vec_sample))
+
+    np.save('samples.npy', joined_array)
+
+def get_score_for_specific_sentences():
+
+    sentence_array = np.load('samples.npy')
+
+    final_array = np.hstack((sentence_array, np.zeros(shape=(1000, 1))))
+
+    sents = []
+
+    original_codes = []
+    original_sentences = []
+
+    for i in range(np.size(final_array,axis=0)):
+
+        cleared_sentence = papers[int(final_array[i,0])].cleared_paper[int(final_array[i,1])]
+
+        original_sentences.append(papers[int(final_array[i,0])].original_paper[int(final_array[i,1])])
+
+        if LEM == True or STOP == True:
+
+            nlp = spacy.load('en', disable=['parser', 'ner', 'textcat'])
+
+            norm_word_list = []
+
+            doc = nlp(cleared_sentence)
+
+            for item in doc:
+                if STOP == True and item.is_stop == True:
+                    pass
+                # else if not item.is_stop
+                else:
+                    # Split dash compounded words and singularize them
+                    word = item.text
+                    tag = item.tag_
+                    if tag == "NNS" and LEM == True:
+                        word = item.lemma_
+                    if "VB" in tag and LEM == True:
+                        word = item.lemma_
+                    norm_word_list.append(word)
+
+            cleared_sentence = ' '.join(norm_word_list)
+
+        sents.append(cleared_sentence)
+
+    ################################## InferSent ############################################
+
+    infersentEncoder = InferSent(vocabulary=vocabulary)
+
+    # Get code embeddings
+    codelist = []
+    for code in codes:
+        codelist.append(code.cleared_code)
+    code_embeddings = infersentEncoder.get_sent_embeddings(codelist)
+    for i in range(len(codes)):
+        codes[i].embedding = code_embeddings[i]
+
+    paper_embeddings = infersentEncoder.get_sent_embeddings(sents)
+
+    for i in range(np.size(final_array, axis=0)):
+        final_array[i,3] = infersentEncoder.cosine(paper_embeddings[i],codes[int(final_array[i,2])].embedding)
+        original_codes.append(codes[int(final_array[i,2])].original_code)
+
+    ################################## Sent2Vec #############################################
+
+    # Get code embeddings
+    codelist = []
+    for code in codes:
+        codelist.append(code.cleared_code)
+    # code_embeddings = sent2vec.sent2vec_encoder.get_sentence_embeddings(codelist, ngram='unigrams', model='toronto')
+
+    code_embeddings = sent2vec.sent2vec_encoder.encode(codelist)
+
+    for i in range(len(codes)):
+        codes[i].embedding = code_embeddings[i]
+
+    paper_embeddings = sent2vec.sent2vec_encoder.encode(sents)
+
+    for i in range(np.size(final_array, axis=0)):
+        final_array[i, 4] = sent2vec.sent2vec_encoder.cosine(paper_embeddings[i], codes[int(final_array[i, 2])].embedding)
+
+    os.chdir(ROOT_DIR)
+
+    if STOP == True and LEM == True:
+        np.savetxt("evaluation_stop_lem.csv", final_array, delimiter=";", fmt='%1.6f')
+    elif STOP == False and LEM == True:
+        np.savetxt("evaluation_lem.csv", final_array, delimiter=";", fmt='%1.6f')
+    elif STOP == True and LEM == False:
+        np.savetxt("evaluation_stop.csv", final_array, delimiter=";", fmt='%1.6f')
+    elif STOP == False and LEM == False:
+        np.savetxt("evaluation.csv", final_array, delimiter=";", fmt='%1.6f')
+
+    with open('sent_codes.csv','w') as s:
+        for i in range(np.size(final_array, axis=0)):
+            s.write(original_sentences[i].encode('utf-8-sig') + ';'+ original_codes[i].encode('utf-8-sig'))
+            s.write('\n')
+    s.close()
+
+#join_sample_arrays(get_infersent_evaluation_samples(),get_sent2vec_evaluation_samples())
+get_score_for_specific_sentences()
+#get_infersent_evaluation_samples()
 #get_sent2vec_score()
 #get_infersent_score()
 
