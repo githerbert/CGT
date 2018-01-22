@@ -93,14 +93,14 @@ def read_codes(filename):
                 for dash_word in dash_seperated_words:
                         word = dash_word.text
                         tag = dash_word.tag_
-                        if tag == "NNS":
+                        if tag == "NNS" and LEM == True:
                             word = item.lemma_
                         tagged_words.append(word)
             #else if not item.is_stop
             else:
                 word = item.text
                 tag = item.tag_
-                if tag == "NNS":
+                if tag == "NNS" and LEM == True:
                     word = item.lemma_
                 if "VB" in tag and LEM == True:
                     word = item.lemma_
@@ -167,6 +167,20 @@ def sent_tokenize_file(filename):
 
     for i in range(len(sent_tokenize_list)):
 
+         words = sent_tokenize_list[i].split()
+
+         # Remove sentences that contain more than 150 words
+         if len(words) > 150:
+             temp_list = []
+             # Check if sentence is longer than 150 words with all invalid words removed
+             for j in range(len(words)):
+                if words[j] in nlp.vocab:
+                    temp_list.append(words[j])
+             if len(temp_list) > 150:
+                 sent_tokenize_list[i] = ""
+             else:
+                 sent_tokenize_list[i] = ' '.join(temp_list)
+
          # Expand contractions
          sent_tokenize_list[i] = expand_contractions(sent_tokenize_list[i])
 
@@ -211,7 +225,7 @@ def sent_tokenize_file(filename):
             # Split dash compounded words and singularize them
                 word = item.text
                 tag = item.tag_
-                if tag == "NNS":
+                if tag == "NNS" and LEM == True:
                     word = item.lemma_
                 if "VB" in tag and LEM == True:
                     word = item.lemma_
@@ -238,6 +252,7 @@ def sent_tokenize_file(filename):
              # Remove sententeces that contain letters only
              if len(word) > 1:
                  letters = True
+         # Remove sentences that contain less than one word
          if validWords == True and letters == True and len(words)>1:
              cleared_list.append(' '.join(words))
              original_list.append(sent_tokenize_list_copy[i].replace(";", ","))
@@ -312,6 +327,8 @@ def csvexport():
                     j = j + 1
 
                 i += 1
+        p.close()
+    s.close()
 
 def csvimport():
 
