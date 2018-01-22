@@ -178,44 +178,10 @@ def get_sent2vec_score():
     #np.savetxt("score.csv", score, delimiter=";", fmt='%1.3f')
     np.save('sent2vec_score.npy', score)
 
-def get_evaluation_samples():
+def get_infersent_evaluation_samples():
     score = np.load('infersent_score.npy')
     #score = np.load('sent2vec_score.npy')
     score = np.nan_to_num(score)
-    print(score[0,:])
-    print(score[1, :])
-    print(np.argwhere(np.isnan(score)))
-    print(len(np.argwhere(np.isnan(score))))
-    #print(score[19085570, :])
-    #print(score[23199679, :])
-    #print(len(np.argwhere(score[:, 3] < 0.01)))
-    #print(len(np.argwhere(score[:, 3] < 1)))
-    #score[score[:, 3].argsort()]
-    #print(len(np.argwhere(score[:, 3] > 0.9)))
-
-    # i = 0.85
-    # length = np.size(score,0)
-    # while i <= 1:
-    #     print("Range between:"+ str(i) + " and "+str(i+0.01))
-    #     smaller = len(np.argwhere(score[:, 3] < i))
-    #     larger = len(np.argwhere(score[:, 3] >= i + 0.01))
-    #     result = length - smaller - larger
-    #     print(result)
-    #     i += 0.01
-    # print("Median")
-    # print(np.median(score[:,3], axis=0))
-    # print("Mean")
-    # print(np.mean(score[:,3], axis=0))
-
-    # print(np.percentile(score, 90, axis=0, interpolation='lower')[3])
-    # print(np.percentile(score, 80, axis=0, interpolation='lower')[3])
-    # print(np.percentile(score, 70, axis=0, interpolation='lower')[3])
-    # print(np.percentile(score, 60, axis=0, interpolation='lower')[3])
-    # print(np.percentile(score, 50, axis=0, interpolation='lower')[3])
-    # print(np.percentile(score, 40, axis=0, interpolation='lower')[3])
-    # print(np.percentile(score, 30, axis=0, interpolation='lower')[3])
-    # print(np.percentile(score, 20, axis=0, interpolation='lower')[3])
-    # print(np.percentile(score, 10, axis=0, interpolation='lower')[3])
 
     # infersent samples: 20 steps
     # 0.7 - 0.9 = 0,2
@@ -224,32 +190,65 @@ def get_evaluation_samples():
     score_column = score[:,3]
     print(score_column.shape)
 
+    sample_array = np.zeros(shape=(0,4))
+
     i = 0.7
 
     while i < 0.9:
         # take 25 samples
         #result = np.where((score_column >= i) & (score_column < (i + 0.01)))
-        result = np.argwhere((score_column >= i) & (score_column < (i + 0.01)))
-        print(np.size(result,axis=0))
-        print(np.size(result, axis=1))
-        random_sample = np.random.choice(result,size=25,replace=False)
-        print(random_sample)
+        result = np.argwhere((score_column >= i) & (score_column < (i + 0.01))).flatten()
+        random_sample = np.random.choice(result,25,replace=False)
+
+        #print(score[random_sample, :])
+        for index in random_sample:
+            print(score[index, :])
+            sample_array = np.vstack((sample_array, score[index, :]))
 
         i += 0.01
+
+    return sample_array
+
+def get_sent2vec_evaluation_samples():
+
+    score = np.load('sent2vec_score.npy')
+    score = np.nan_to_num(score)
+
+    # infersent samples: 20 steps
+    # 0.7 - 0.9 = 0,2
+
+    print("score_column")
+    score_column = score[:,3]
+    print(score_column.shape)
+
+    sample_array = np.zeros(shape=(0,4))
 
     # sent2vec samples: 64 steps
     # 0.22 - 0.86 = 0,64
 
-    # i = 0.22
+    i = 0.22
     #
-    # while i < 0.86:
+    while i < 0.86:
     #     # take 8 samples. Last 12 steps only take 7 samples
-    #     result = np.argwhere((score_column >= i) & (score_column < (i + 0.01)))
-    #     print(np.size(result, axis=0))
-    #     print(np.size(result, axis=1))
-    #     i += 0.01
+        result = np.argwhere((score_column >= i) & (score_column < (i + 0.01))).flatten()
 
-get_evaluation_samples()
+        sample_size = 8
+
+        if True:
+            sample_size = 8
+        else:
+            sample_size = 7
+
+        random_sample = np.random.choice(result,sample_size,replace=False)
+
+        #print(score[random_sample, :])
+        for index in random_sample:
+            print(score[index, :])
+            sample_array = np.vstack((sample_array, score[index, :]))
+
+        i += 0.01
+
+get_infersent_evaluation_samples()
 #get_sent2vec_score()
 #get_infersent_score()
 
