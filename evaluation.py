@@ -267,6 +267,8 @@ def get_score_for_specific_sentences():
     original_codes = []
     original_sentences = []
 
+    nlp = spacy.load('en', disable=['parser', 'ner', 'textcat'])
+
     for i in range(np.size(final_array,axis=0)):
 
         cleared_sentence = papers[int(final_array[i,0])].cleared_paper[int(final_array[i,1])]
@@ -274,8 +276,6 @@ def get_score_for_specific_sentences():
         original_sentences.append(papers[int(final_array[i,0])].original_paper[int(final_array[i,1])])
 
         if LEM == True or STOP == True:
-
-            nlp = spacy.load('en', disable=['parser', 'ner', 'textcat'])
 
             norm_word_list = []
 
@@ -338,13 +338,13 @@ def get_score_for_specific_sentences():
     os.chdir(ROOT_DIR)
 
     if STOP == True and LEM == True:
-        np.savetxt("evaluation_stop_lem.csv", final_array, delimiter=";", fmt='%1.6f')
+        np.savetxt("evaluation_stop_lem.csv", final_array, delimiter=";", fmt='%i %i %i %1.6f %1.6f')
     elif STOP == False and LEM == True:
-        np.savetxt("evaluation_lem.csv", final_array, delimiter=";", fmt='%1.6f')
+        np.savetxt("evaluation_lem.csv", final_array, delimiter=";", fmt='%i %i %i %1.6f %1.6f')
     elif STOP == True and LEM == False:
-        np.savetxt("evaluation_stop.csv", final_array, delimiter=";", fmt='%1.6f')
+        np.savetxt("evaluation_stop.csv", final_array, delimiter=";", fmt='%i %i %i %1.6f %1.6f')
     elif STOP == False and LEM == False:
-        np.savetxt("evaluation.csv", final_array, delimiter=";", fmt='%1.6f')
+        np.savetxt("evaluation.csv", final_array, delimiter=";", fmt='%i %i %i %1.6f %1.6f')
 
     with open('sent_codes.csv','w') as s:
         for i in range(np.size(final_array, axis=0)):
