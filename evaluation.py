@@ -338,13 +338,13 @@ def get_score_for_specific_sentences():
     os.chdir(ROOT_DIR)
 
     if STOP == True and LEM == True:
-        np.savetxt("evaluation_stop_lem.csv", final_array, delimiter=";", fmt='%i %i %i %1.6f %1.6f')
+        np.savetxt("evaluation_stop_lem.csv", final_array, delimiter=";", fmt='%i; %i; %i; %1.6f; %1.6f')
     elif STOP == False and LEM == True:
-        np.savetxt("evaluation_lem.csv", final_array, delimiter=";", fmt='%i %i %i %1.6f %1.6f')
+        np.savetxt("evaluation_lem.csv", final_array, delimiter=";", fmt='%i; %i; %i; %1.6f; %1.6f')
     elif STOP == True and LEM == False:
-        np.savetxt("evaluation_stop.csv", final_array, delimiter=";", fmt='%i %i %i %1.6f %1.6f')
+        np.savetxt("evaluation_stop.csv", final_array, delimiter=";", fmt='%i; %i; %i; %1.6f; %1.6f')
     elif STOP == False and LEM == False:
-        np.savetxt("evaluation.csv", final_array, delimiter=";", fmt='%i %i %i %1.6f %1.6f')
+        np.savetxt("evaluation.csv", final_array, delimiter=";", fmt='%i; %i; %i; %1.6f; %1.6f')
 
     with open('sent_codes.csv','w') as s:
         for i in range(np.size(final_array, axis=0)):
