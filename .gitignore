@@ -109,3 +109,5 @@ samples\.npy
 sent2vec/fasttext
 
 *.npy
+
+*.xml
