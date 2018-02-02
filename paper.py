@@ -4,5 +4,5 @@ class Paper:
         self.id = id
         self.original_paper = original_paper
         self.cleared_paper = cleared_paper
-	self.title = title
-	self.path = path
+        self.title = title
+        self.path = path
