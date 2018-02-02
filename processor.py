@@ -346,7 +346,55 @@ def get_sent2vec_relevance_ranking():
                         print("     " + corr_sentence + "Score: " + str(sentence_array[s,3]))
 
 
-    print(scores_above_threshold)
+def print_sent2vec_relevance_ranking():
+
+    score = np.load('sent2vec_score.npy')
+
+    # Keep all scores which are greater than the threshold
+    idx = np.where(score[:,3] > sent2vec_threshold)
+
+    scores_above_threshold = score[idx]
+
+    # Iterature through all codes
+
+    with open('sent2vec_relevance_ranking.csv','w') as r:
+
+        for code in codes:
+            print("Code " + str(code.id) + ": " + code.original_code)
+            paper_code_id = np.where(scores_above_threshold[:,2] == float(code.id))
+            paper_code_array = scores_above_threshold[paper_code_id]
+
+            # Find all corresponding papers to this code
+            unique_papers = np.unique(paper_code_array[:,0])
+
+            if len(unique_papers) < 1:
+                print("No corresponding literature found")
+            else:
+                # Create array for the relevance scores of the papers
+                relevancescore = np.zeros(shape=(len(unique_papers), 2))
+                for index in range(len(unique_papers)):
+                    relevancescore[index,0] = unique_papers[index]
+                    sentence_index = np.where(paper_code_array[:,0] == unique_papers[index])
+                    sentence_array = paper_code_array[sentence_index]
+                    # Iterate over all relevant sentences of the paper
+                    for s in range(np.size(sentence_array, axis=0)):
+                        relevancescore[index, 1] = relevancescore[index, 1] + sentence_array[s,3]
+
+                relevancescore_sorted = np.flip(relevancescore[relevancescore[:,1].argsort()],0)
+                for p in range(np.size(relevancescore_sorted, axis=0)):
+                    corr_paper = papers[int(relevancescore_sorted[p,0])]
+                    print(" # "+ str(p+1) + " Paper_title: " + corr_paper.title + "    Relevance Score: " + str(relevancescore_sorted[p,1]))
+                    if paper_details == True:
+                        sentence_index = np.where(paper_code_array[:, 0] == relevancescore_sorted[p,0])
+                        sentence_array = paper_code_array[sentence_index]
+                        # Iterate over all relevant sentences of the paper
+                        for s in range(np.size(sentence_array, axis=0)):
+                            corr_sentence = papers[int(relevancescore_sorted[p, 0])].original_paper[int(sentence_array[s,1])]
+                            r.write(code.original_code.encode('utf-8-sig') + ';' + corr_sentence.encode('utf-8-sig') + ";" + str(sentence_array[s,3]).encode('utf-8-sig') + ";" + corr_paper.title.encode('utf-8-sig') + ";" + corr_paper.path.encode('utf-8-sig'))
+                            r.write('\n')
+
+    r.close()
+
 
 
 #join_sample_arrays(get_infersent_evaluation_samples(),get_sent2vec_evaluation_samples())
@@ -354,5 +402,6 @@ def get_sent2vec_relevance_ranking():
 #get_infersent_evaluation_samples()
 #get_sent2vec_score()
 #get_infersent_score()
-get_sent2vec_relevance_ranking()
+#get_sent2vec_relevance_ranking()
+print_sent2vec_relevance_ranking()
 
