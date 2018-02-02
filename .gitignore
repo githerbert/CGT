@@ -99,3 +99,13 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+sent2vec_score\.npy
+
+samples\.npy
+
+*.csv
+
+sent2vec/fasttext
+
+*.npy
