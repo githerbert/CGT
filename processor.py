@@ -2,44 +2,54 @@
 # import modules & set up logging
 import PreProcessor
 import numpy as np
-from Definitions import ROOT_DIR, LEM, STOP, infersent_threshold, sent2vec_threshold, paper_details
+from Definitions import ROOT_DIR, infersent_threshold, sent2vec_threshold, paper_details, INFERSENT, SENT2VEC
 import os, PreProcessor
 from InferSent.encoder.infersent import InferSent
-from code import Code
 import sent2vec.sent2vec_encoder
 import time
-import spacy
 
 os.chdir(ROOT_DIR)
 
-papers = PreProcessor.csvimport()
-codes = PreProcessor.code_to_list()
+papers = []
+codes = []
 
-numberOfPapers = len(papers)
+numberOfPapers = 0
 
 vocabulary = {}
 vocabulary = set()
 
-#Build vocabulary from codes und papers
-for code in codes:
-    vocabulary.update(code.cleared_code.split())
-
 numberOfSentences = 0
 
-for paper in papers:
-    numberOfSentences += len(paper.cleared_paper)
-    for line in paper.cleared_paper:
-        vocabulary.update(line.split())
+numberOfScores = 0
 
-vocabulary = list(vocabulary)
+def load_codes_and_papers():
+    global papers
+    global codes
+    global numberOfPapers
+    global vocabulary
+    global numberOfSentences
+    global numberOfScores
 
-print("Codes " + str(len(codes)))
-print("sents " + str(numberOfSentences))
+    papers = PreProcessor.csvimport()
+    codes = PreProcessor.code_to_list()
 
-numberOfScores = len(codes) * numberOfSentences
+    numberOfPapers = len(papers)
 
+    # Build vocabulary from codes und papers
+    for code in codes:
+        vocabulary.update(code.cleared_code.split())
 
-#infersentEncoder = InferSent(vocabulary=vocabulary)
+    for paper in papers:
+        numberOfSentences += len(paper.cleared_paper)
+        for line in paper.cleared_paper:
+            vocabulary.update(line.split())
+
+    vocabulary = list(vocabulary)
+
+    print("Codes " + str(len(codes)))
+    print("sents " + str(numberOfSentences))
+
+    numberOfScores = len(codes) * numberOfSentences
 
 
 def get_infersent_score():
@@ -391,12 +401,4 @@ def infersent_relevance_ranking_to_disk():
                             r.write('\n')
 
     r.close()
-
-
-#get_sent2vec_score()
-#get_infersent_score()
-print_sent2vec_relevance_ranking()
-#sent2vec_relevance_ranking_to_disk()
-#print_infersent_relevance_ranking()
-#infersent_relevance_ranking_to_disk()
 

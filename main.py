@@ -1,28 +1,27 @@
 # -*- coding: utf-8 -*-
 # import modules & set up logging
 import PreProcessor
-import numpy as np
+import processor
+from Definitions import SENT2VEC, INFERSENT
 
 def main():
     print("Programm is starting...")
-   # for code in PreProcessor.code_to_list():
-	#print(code.cleared_code)
-    score = np.zeros(shape=(50,3))
-    score[25,0] = 150
-    print(score)
-    print(score.max(axis=0)[0])
-    score = np.zeros(shape=(10,3))
-    score[0,0] = 1
-    score[1,0] = 2
-    score[2,0] = 3
-    score[3,0] = 4
-    score[4,0] = 5
-    print(np.percentile(score, 50, axis=0)[0])
-    #PreProcessor.csvexport()
-    # for paper in PreProcessor.csvimport():
-    #     print("title: "+ paper.title)
-    #     print(paper.cleared_paper)
+    # print("Pre-processing papers... (Estimated time: 1 hour)")
+    # PreProcessor.csvexport()
+    # print("Loading pre-processed codes and papers...")
+    processor.load_codes_and_papers()
+    #
+    # print("Encoding papers... (Estimated time: 1 hour)")
+    # if SENT2VEC == True and INFERSENT == False:
+    #     processor.get_sent2vec_score()
+    # elif INFERSENT == True and SENT2VEC == False:
+    #     processor.get_infersent_score()
 
+    print("Printing paper ranking... ")
+    if SENT2VEC == True and INFERSENT == False:
+        processor.print_sent2vec_relevance_ranking()
+    elif INFERSENT == True and SENT2VEC == False:
+        processor.print_infersent_relevance_ranking()
     
 
 if __name__ == "__main__":

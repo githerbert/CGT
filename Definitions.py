@@ -13,7 +13,11 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 LEM = True
 # Activate stopword removal
 STOP = False
-# Activate cuda
+# Use Sent2Vec model (Needs 1,5 hours to process all papers)
+SENT2VEC = False
+# Use InferSent model (Needs 1 hour to process all papers with activated CUDA)
+INFERSENT = True
+# Activate cuda for inferSent (This is highly recommended because no CUDA use needs 10 hours)
 CUDA = True
 
 # Show all paper details including single corresponding sentences in paper ranking
