@@ -19,7 +19,7 @@ SNLP_TAGGER_JAR = os.path.join(BASE_SNLP_PATH, "stanford-postagger.jar")
 
 MODEL_WIKI_UNIGRAMS = os.path.abspath("./sent2vec_wiki_unigrams")
 MODEL_WIKI_BIGRAMS = os.path.abspath("./sent2vec_wiki_bigrams")
-MODEL_TORONTOBOOKS_UNIGRAMS = "/media/ubuntu/San480/VMs/Shared/torontobooks_unigrams.bin"
+MODEL_TORONTOBOOKS_UNIGRAMS = os.path.join(BASE_SNLP_PATH, "torontobooks_unigrams.bin")
 MODEL_TORONTOBOOKS_BIGRAMS = os.path.abspath("./sent2vec_wiki_bigrams")
 MODEL_TWITTER_UNIGRAMS = os.path.abspath('./sent2vec_twitter_unigrams')
 MODEL_TWITTER_BIGRAMS = os.path.abspath('./sent2vec_twitter_bigrams')
