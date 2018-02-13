@@ -1,12 +1,9 @@
-infersent_model_path= 'https://s3.amazonaws.com/senteval/infersent/infersent.allnli.pickle'
-
 
 # InferSent Model
-echo $infersent_model_path
-mkdir GloVe
-curl -LO InferSent/encoder/infersent.allnli.pickle $infersent_model_path
+echo 'Get InferSent Model'
+(cd InferSent/encoder && curl -LO https://s3.amazonaws.com/senteval/infersent/infersent.allnli.pickle)
 
-source InferSent/dataset/get_data.bash
+(cd InferSent/dataset && source get_data.bash)
 
 
 
