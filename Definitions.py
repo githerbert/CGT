@@ -21,7 +21,7 @@ INFERSENT = True
 CUDA = True
 
 # Show all paper details including single corresponding sentences in paper ranking
-paper_details = True
+paper_details = False
 
 infersent_threshold = 0.878
 sent2vec_threshold = 0.847

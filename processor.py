@@ -7,6 +7,7 @@ import os, PreProcessor
 from InferSent.encoder.infersent import InferSent
 import sent2vec.sent2vec_encoder
 import time
+from prettytable import PrettyTable
 
 os.chdir(ROOT_DIR)
 
@@ -179,22 +180,35 @@ def print_sent2vec_relevance_ranking():
                     relevancescore[index, 1] = relevancescore[index, 1] + sentence_array[s, 3]
 
             relevancescore_sorted = np.flip(relevancescore[relevancescore[:, 1].argsort()], 0)
+
+            tt = PrettyTable(['Paper Rank', 'Relevance Score', 'Paper Title'])
+            tt.align["Paper Title"] = "l"
+
             for p in range(np.size(relevancescore_sorted, axis=0)):
                 corr_paper = papers[int(relevancescore_sorted[p, 0])]
                 weighted_papers = np.array(relevancescore_sorted[p, :], copy=True)
                 weighted_papers[1] = weighted_papers[1] / m
                 interview_scores = np.vstack((interview_scores, weighted_papers))
-                print(" # " + str(p + 1) + " Paper_title: " + corr_paper.title + "    Relevance Score: " + str(
-                    relevancescore_sorted[p, 1]))
+                # print(" # "+ str(p+1) + " Paper_title: " + corr_paper.title + "    Relevance Score: " + str(relevancescore_sorted[p,1]))
+                t = PrettyTable(['Paper Rank', 'Relevance Score', 'Paper Title'])
+                t.align["Paper Title"] = "l"
+                t.add_row([str(p + 1), str(round(relevancescore_sorted[p, 1], 4)), corr_paper.title])
+                tt.add_row([str(p + 1), str(round(relevancescore_sorted[p, 1], 4)), corr_paper.title])
+
                 if paper_details == True:
+                    print t
                     sentence_index = np.where(paper_code_array[:, 0] == relevancescore_sorted[p, 0])
                     sentence_array = paper_code_array[sentence_index]
                     # Iterate over all relevant sentences of the paper
+                    st = PrettyTable(['          ', 'Sentence No.', 'Similarity', 'Sentence'])
+                    st.align["Sentence"] = "l"
                     for s in range(np.size(sentence_array, axis=0)):
                         corr_sentence = papers[int(relevancescore_sorted[p, 0])].original_paper[
                             int(sentence_array[s, 1])]
-                        print("Sentence no: " + str(s + 1) + " Similarity: " + str(
-                            sentence_array[s, 3]) + "  " + corr_sentence)
+                        st.add_row(["    ", str(s + 1), str(round(sentence_array[s, 3], 4)), corr_sentence])
+                    print st
+            if paper_details == False:
+                print tt
 
     print(
         "########### INTERVIEW PAPER RANKING ######################################################################################")
@@ -215,11 +229,12 @@ def print_sent2vec_relevance_ranking():
                 relevancescore[index, 1] = relevancescore[index, 1] + paper_array[s, 1]
 
         iv_relevancescore_sorted = np.flip(relevancescore[relevancescore[:, 1].argsort()], 0)
-
+        t = PrettyTable(['Rank', 'Relevance Score', 'Paper Title'])
+        t.align["Paper Title"] = "l"
         for p in range(np.size(iv_relevancescore_sorted, axis=0)):
             corr_paper = papers[int(iv_relevancescore_sorted[p, 0])]
-            print(" # " + str(p + 1) + " Paper_title: " + corr_paper.title + "   Weighted Relevance Score: " + str(
-                iv_relevancescore_sorted[p, 1]))
+            t.add_row([str(p + 1), str(round(iv_relevancescore_sorted[p, 1], 4)), corr_paper.title])
+        print t
 
 
 def sent2vec_relevance_ranking_to_disk():
@@ -314,19 +329,34 @@ def print_infersent_relevance_ranking():
                     relevancescore[index, 1] = relevancescore[index, 1] + sentence_array[s,3]
 
             relevancescore_sorted = np.flip(relevancescore[relevancescore[:,1].argsort()],0)
+
+            tt = PrettyTable(['Paper Rank', 'Relevance Score', 'Paper Title'])
+            tt.align["Paper Title"] = "l"
+
             for p in range(np.size(relevancescore_sorted, axis=0)):
                 corr_paper = papers[int(relevancescore_sorted[p,0])]
                 weighted_papers = np.array(relevancescore_sorted[p, :], copy=True)
                 weighted_papers[1] = weighted_papers[1]/m
                 interview_scores = np.vstack((interview_scores, weighted_papers))
-                print(" # "+ str(p+1) + " Paper_title: " + corr_paper.title + "    Relevance Score: " + str(relevancescore_sorted[p,1]))
+                #print(" # "+ str(p+1) + " Paper_title: " + corr_paper.title + "    Relevance Score: " + str(relevancescore_sorted[p,1]))
+                t = PrettyTable(['Paper Rank', 'Relevance Score', 'Paper Title'])
+                t.align["Paper Title"] = "l"
+                t.add_row([str(p+1), str(round(relevancescore_sorted[p,1],4)), corr_paper.title])
+                tt.add_row([str(p + 1), str(round(relevancescore_sorted[p, 1], 4)), corr_paper.title])
+
                 if paper_details == True:
+                    print t
                     sentence_index = np.where(paper_code_array[:, 0] == relevancescore_sorted[p,0])
                     sentence_array = paper_code_array[sentence_index]
                     # Iterate over all relevant sentences of the paper
+                    st = PrettyTable(['          ','Sentence No.', 'Similarity', 'Sentence'])
+                    st.align["Sentence"] = "l"
                     for s in range(np.size(sentence_array, axis=0)):
                         corr_sentence = papers[int(relevancescore_sorted[p, 0])].original_paper[int(sentence_array[s,1])]
-                        print("Sentence no: " + str(s+1) + " Similarity: " + str(sentence_array[s,3]) + "  " + corr_sentence)
+                        st.add_row(["    ",str(s + 1), str(round(sentence_array[s,3],4)), corr_sentence])
+                    print st
+            if paper_details == False:
+                print tt
 
     print("########### INTERVIEW PAPER RANKING ######################################################################################")
 
@@ -346,11 +376,12 @@ def print_infersent_relevance_ranking():
                 relevancescore[index, 1] = relevancescore[index, 1] + paper_array[s, 1]
 
         iv_relevancescore_sorted = np.flip(relevancescore[relevancescore[:, 1].argsort()], 0)
-
+        t = PrettyTable(['Rank', 'Relevance Score', 'Paper Title'])
+        t.align["Paper Title"] = "l"
         for p in range(np.size(iv_relevancescore_sorted, axis=0)):
             corr_paper = papers[int(iv_relevancescore_sorted[p, 0])]
-            print(" # " + str(p + 1) + " Paper_title: " + corr_paper.title + "   Weighted Relevance Score: " + str(
-                iv_relevancescore_sorted[p, 1]))
+            t.add_row([str(p + 1), str(round(iv_relevancescore_sorted[p, 1],4)), corr_paper.title])
+        print t
 
 
 def infersent_relevance_ranking_to_disk():
