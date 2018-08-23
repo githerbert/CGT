@@ -43,19 +43,17 @@ To use this application Linux or macOS is required. In addition, you need Python
 	9. regex
 		conda install -c conda-forge regex
 
-# Depending on the sentence enconder you want to use further installation are needed
+### Depending on the sentence enconder you want to use further installation are needed
 		
-# Sent2Vec Install Instruction
+### Sent2Vec Install Instruction
 
-- change directory to CGT/Sent2Vec
-- use "make" command so C++ files are compiled (Requires C++ compiler like g++)
-
-download the pre-trained model (2GB):
+1. change directory to CGT/Sent2Vec
+2. use "make" command so C++ files are compiled (Requires C++ compiler like g++)
+3. download the pre-trained model (2GB):
 https://drive.google.com/open?id=0B6VhzidiLvjSOWdGM0tOX1lUNEk
+4. move the downloaded torontobooks_unigrams.bin file to path CGT/Sent2Vec
 
-move the downloaded torontobooks_unigrams.bin file to path CGT/Sent2Vec
-
-# InferSent Install Instruction
+### InferSent Install Instruction
 
 1. Install Nvidia CUDA (Optional but highly recommended)
 
@@ -67,7 +65,7 @@ move the downloaded torontobooks_unigrams.bin file to path CGT/Sent2Vec
 
 	source get_data.bash
 	
-# Set parameters and start the programm
+### Set parameters and start the programm
 		
  Set parameters in CGT/Definitions.py including the variables:
 	- PAPER_DIR: Path of the papers folder
